@@ -2,8 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="UTF-8">
-    <title>detail</title>
+  <meta charset="UTF-8">
+  <title>detail</title>
 </head>
 <body>
 <table>
@@ -12,12 +12,17 @@
     <th>email</th>
     <th>password</th>
     <th>name</th>
+    <th>phone</th>
+    <th>birth</th>
   </tr>
   <tr>
     <td th:text="${member.id}"></td>
-    <td th:text="${member.memberEmail}"></td>
-    <td th:text="${member.memberPassword}"></td>
-    <td th:text="${member.memberName}"></td>
+    <td th:text="${member.userId}"></td>
+    <td th:text="${member.userEmail}"></td>
+    <td th:text="${member.userPassword}"></td>
+    <td th:text="${member.userName}"></td>
+    <td th:text="${member.userPhone}"></td> <!-- Add this line for memberPhone -->
+    <td th:text="${member.userBirth}"></td> <!-- Add this line for memberBirth -->
   </tr>
 </table>
 </body>

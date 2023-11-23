@@ -27,11 +27,11 @@ public class MemberService {
             1. 회원이 입력한 이메일로 DB에서 조회를 함
             2. DB에서 조회한 비밀번호와 사용자가 입력한 비밀번호가 일치하는지 판단
          */
-        Optional<MemberEntity> byMemberEmail = memberRepository.findByMemberEmail(memberDTO.getMemberEmail());
-        if (byMemberEmail.isPresent()) {
+        Optional<MemberEntity> byUserId = memberRepository.findByUserId(memberDTO.getUserId());
+        if (byUserId.isPresent()) {
             // 조회 결과가 있다(해당 이메일을 가진 회원 정보가 있다)
-            MemberEntity memberEntity = byMemberEmail.get();
-            if (memberEntity.getMemberPassword().equals(memberDTO.getMemberPassword())) {
+            MemberEntity memberEntity = byUserId.get();
+            if (memberEntity.getUserPassword().equals(memberDTO.getUserPassword())) {
                 // 비밀번호 일치
                 // entity -> dto 변환 후 리턴
                 MemberDTO dto = MemberDTO.toMemberDTO(memberEntity);
@@ -70,8 +70,8 @@ public class MemberService {
 
     }
 
-    public MemberDTO updateForm(String myEmail) {
-        Optional<MemberEntity> optionalMemberEntity = memberRepository.findByMemberEmail(myEmail);
+    public MemberDTO updateForm(String myuserId) {
+        Optional<MemberEntity> optionalMemberEntity = memberRepository.findByUserId(myuserId);
         if (optionalMemberEntity.isPresent()) {
             return MemberDTO.toMemberDTO(optionalMemberEntity.get());
         } else {
@@ -87,9 +87,9 @@ public class MemberService {
         memberRepository.deleteById(id);
     }
 
-    public String emailCheck(String memberEmail) {
-        Optional<MemberEntity> byMemberEmail = memberRepository.findByMemberEmail(memberEmail);
-        if (byMemberEmail.isPresent()) {
+    public String idCheck(String userid) {
+        Optional<MemberEntity> byUserId = memberRepository.findByUserId(userid);
+        if (byUserId.isPresent()) {
             // 조회결과가 있다 -> 사용할 수 없다.
             return null;
         } else {
@@ -98,7 +98,6 @@ public class MemberService {
         }
     }
 }
-
 
 
 

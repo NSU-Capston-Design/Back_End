@@ -11,34 +11,48 @@ import javax.persistence.*;
 @Getter
 @Table(name = "member_table")
 public class MemberEntity {
-    @Id // pk 지정
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true) // unique 제약조건 추가
-    private String memberEmail;
+    @Column
+    private String userId;
+
+    @Column(unique = true)
+    private String userEmail;
 
     @Column
-    private String memberPassword;
+    private String userPassword;
 
     @Column
-    private String memberName;
+    private String userName;
+
+    @Column // 새로운 필드
+    private String userPhone;
+
+    @Column // 새로운 필드
+    private String userBirth;
 
     public static MemberEntity toMemberEntity(MemberDTO memberDTO) {
         MemberEntity memberEntity = new MemberEntity();
-        memberEntity.setMemberEmail(memberDTO.getMemberEmail());
-        memberEntity.setMemberPassword(memberDTO.getMemberPassword());
-        memberEntity.setMemberName(memberDTO.getMemberName());
+        memberEntity.setUserId(memberDTO.getUserId());
+        memberEntity.setUserEmail(memberDTO.getUserEmail());
+        memberEntity.setUserPassword(memberDTO.getUserPassword());
+        memberEntity.setUserName(memberDTO.getUserName());
+        memberEntity.setUserPhone(memberDTO.getUserPhone()); // memberPhone 설정
+        memberEntity.setUserBirth(memberDTO.getUserBirth()); // memberBirth 설정
         return memberEntity;
     }
 
     public static MemberEntity toUpdateMemberEntity(MemberDTO memberDTO) {
         MemberEntity memberEntity = new MemberEntity();
         memberEntity.setId(memberDTO.getId());
-        memberEntity.setMemberEmail(memberDTO.getMemberEmail());
-        memberEntity.setMemberPassword(memberDTO.getMemberPassword());
-        memberEntity.setMemberName(memberDTO.getMemberName());
+        memberEntity.setUserId(memberDTO.getUserId());
+        memberEntity.setUserEmail(memberDTO.getUserEmail());
+        memberEntity.setUserPassword(memberDTO.getUserPassword());
+        memberEntity.setUserName(memberDTO.getUserName());
+        memberEntity.setUserPhone(memberDTO.getUserPhone()); // memberPhone 설정
+        memberEntity.setUserBirth(memberDTO.getUserBirth()); // memberBirth 설정
         return memberEntity;
     }
-
 }
