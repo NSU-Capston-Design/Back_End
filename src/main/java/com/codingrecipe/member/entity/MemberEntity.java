@@ -15,7 +15,7 @@ public class MemberEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique = true)
     private String userId;
 
     @Column(unique = true)
@@ -27,7 +27,7 @@ public class MemberEntity {
     @Column
     private String userName;
 
-    @Column // 새로운 필드
+    @Column(unique = true)
     private String userPhone;
 
     @Column // 새로운 필드

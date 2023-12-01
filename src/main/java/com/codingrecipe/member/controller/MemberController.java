@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -36,12 +37,13 @@ public class MemberController {
     }
 
     @PostMapping("/user/login")            //user/login
-    public String login(@RequestBody MemberDTO memberDTO, HttpSession session) {
+    public String login(@RequestBody MemberDTO memberDTO, HttpServletRequest httpServletRequest) {
         MemberDTO loginResult = memberService.login(memberDTO);
         if (loginResult != null) {
-            // login 성공
+            // login 성공시 세션 부여
+            HttpSession session = httpServletRequest.getSession();  // 세션 생성
             session.setAttribute("userId", loginResult.getUserId());
-            return "main";
+            return "/mainpage";
         } else {
             // login 실패
             return "login";
@@ -63,7 +65,7 @@ public class MemberController {
         return "detail";
     }
 
-    @GetMapping("/user/update")   // user/update  이메일로 하는걸 아이디로 바꿔라
+    @GetMapping("/user/update")
     public String updateForm(HttpSession session, Model model) {
         String myuserId = (String) session.getAttribute("loginuserId");
         MemberDTO memberDTO = memberService.updateForm(myuserId);
@@ -83,17 +85,16 @@ public class MemberController {
         return "redirect:/user/";
     }
 
-    @GetMapping("/user/logout")   // user/logout 세션저장 방법
+    @PostMapping("/user/logout")   // user/logout 세션 삭제
     public String logout(HttpSession session) {
         session.invalidate();
-        return "index";
+        return "redirect:/";
     }
 
     @PostMapping("/user/userid-check")     //user/user_id-check
     public @ResponseBody String idCheck(@RequestBody String userid) {
         System.out.println("userid = " + userid);
-        String checkResult = memberService.idCheck(userid);
-        return checkResult;
+        return memberService.idCheck(userid);
 //        if (checkResult != null) {
 //            return "ok";
 //        } else {

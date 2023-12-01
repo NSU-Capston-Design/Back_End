@@ -18,8 +18,12 @@ public class MemberApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/**")
+						.allowedOrigins("http://localhost:3000")	// 소스 주소 허용
+						.allowedMethods("*")	// 메서드 허용
+						.allowCredentials(true);	// 자격 증명 허용 (쿠키, HTTP 인증 등)
 			}
 		};
 	}
 }
+
