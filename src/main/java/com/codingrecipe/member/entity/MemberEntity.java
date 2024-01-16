@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -32,6 +34,9 @@ public class MemberEntity {
 
     @Column // 새로운 필드
     private String userBirth;
+
+    @OneToMany(mappedBy = "memberEntity", cascade = CascadeType.ALL)
+    private List<ProductEntity> productEntityList = new ArrayList<>();
 
     public static MemberEntity toMemberEntity(MemberDTO memberDTO) {
         MemberEntity memberEntity = new MemberEntity();

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class MemberController {
     // 생성자 주입
@@ -43,14 +43,16 @@ public class MemberController {
             // login 성공시 세션 부여
             HttpSession session = httpServletRequest.getSession();  // 세션 생성
             session.setAttribute("userId", loginResult.getUserId());
+            System.out.println("session = " + session);
             return "/mainpage";
         } else {
             // login 실패
+            System.out.println("loginResult = " + loginResult);
             return "login";
         }
     }
 
-    @GetMapping("/user/")
+    @GetMapping("/user")
     public String findAll(Model model) {
         List<MemberDTO> memberDTOList = memberService.findAll();
         // 어떠한 html로 가져갈 데이터가 있다면 model 사용
