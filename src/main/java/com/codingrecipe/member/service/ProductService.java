@@ -2,6 +2,7 @@ package com.codingrecipe.member.service;
 
 import com.codingrecipe.member.dto.ProductDTO;
 import com.codingrecipe.member.dto.ProductData;
+import com.codingrecipe.member.dto.ProductDetail;
 import com.codingrecipe.member.dto.ProductRequest;
 import com.codingrecipe.member.entity.ProductEntity;
 import com.codingrecipe.member.repository.ProductRepository;
@@ -12,11 +13,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -47,7 +51,10 @@ public class ProductService {
 
             String filePath = uploadDir + File.separator + replaceProductName;   // 파일 경로 설정 (uploadDir에는 static 포토주소 있음)
             File dest = new File(filePath);         // 파일 객체 dest를 생성 하고, 파일 경로를 넣음
-            file.transferTo(dest);    // transferTo 메서드는 MultipartFile에서 실제 파일로의 이동 또는 복사를 수행하는 메서드입니다.
+            file.transferTo(dest);    // transferTo 메서드는 MultipartFile에서 실제 파일로의 이동 또는 복사를 수행하는 메서드. (절대경로에 저장)
+
+            filePath = "/photos/postPhoto/" + replaceProductName;   // 상대경로로 변경
+
 
 
             ProductDTO fileUploadDTO = new ProductDTO(produtName, file.getSize(),
@@ -76,8 +83,9 @@ public class ProductService {
         for (ProductEntity productEntity : fileEntityList){
             ProductDTO fileUploadDTO = ProductDTO.toFileDTO(productEntity);
 
-            String imageURL = "/photos/postPhoto/" + productEntity.getProductName(); // 상대 경로를 생성합니다.
-            fileUploadDTO.setProductURL(imageURL);
+//            String imageURL = "/photos/postPhoto/" + productEntity.getProductName(); // 상대 경로를 생성합니다.
+//            System.out.println("imageURL = " + imageURL);
+//            fileUploadDTO.setProductURL(imageURL);
             fileDTOList.add(fileUploadDTO);
 //            fileUploadDTO.setProductURL(uploadDir + "/" + uploadedFileEntity.getId());
 
@@ -85,5 +93,28 @@ public class ProductService {
         return fileDTOList;
     }
 
+    public ProductDetail productDetail(Long id) throws EntityNotFoundException { // 조회수 업데이트 및 상품 디테일
+        Optional<ProductEntity> findId = productRepository.findById(id);
+        if(findId.isPresent()) {
+            ProductEntity productEntity = findId.get();
+            int findProductView = productEntity.getProductView();
+            productEntity.setProductView(findProductView + 1);
+
+            return new ProductDetail(productEntity);
+        } else {
+            throw new EntityNotFoundException("해당 상품을 찾을 수 없습니다.");
+        }
+    }
+
+//    public void productViews(Long id) throws EntityNotFoundException{
+//        Optional<ProductEntity> findId = productRepository.findById(id);
+//        if (findId.isPresent()){
+//            ProductEntity productEntity = findId.get();
+//            int findProductView = productEntity.getProductView();
+//            productEntity.setProductView(findProductView + 1);
+//        } else {
+//            throw new EntityNotFoundException("해당 상품을 찾을 수 없습니다.");
+//        }
+//    }
 
 }

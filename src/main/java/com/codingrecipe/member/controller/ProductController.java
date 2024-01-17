@@ -2,6 +2,7 @@ package com.codingrecipe.member.controller;
 
 import com.codingrecipe.member.dto.ProductDTO;
 import com.codingrecipe.member.dto.ProductData;
+import com.codingrecipe.member.dto.ProductDetail;
 import com.codingrecipe.member.dto.ProductRequest;
 import com.codingrecipe.member.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,17 +12,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @RestController
 public class ProductController {
 
+    @Autowired
     private ProductService productService;
 
-    @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
 
     @PostMapping(value = "/upload")
     public ResponseEntity<String> handleFileUpload(@RequestPart(value = "file") MultipartFile file,
@@ -42,19 +41,30 @@ public class ProductController {
         }
 
     }
-//    @RequestPart(value = "productName") String name,
-//    @RequestParam(value = "productPrice") int price,
-//    @RequestPart(value = "userName") String userName
+
     @GetMapping("/product/list")
-    public List<ProductDTO> findAll(Model model) {
+    public ResponseEntity<List<ProductDTO>> findAll() {
         List<ProductDTO> fileDTOList = productService.productList();
         // 어떠한 html로 가져갈 데이터가 있다면 model 사용
-        model.addAttribute("productList", fileDTOList);
-        return fileDTOList;
+
+        return ResponseEntity.ok(fileDTOList);
     } // 관리자모드 회원목록
 
-//    @GetMapping("/product")
-//    public String handleFileList(@RequestBody FileUploadDTO fileUploadDTO){
-//        return fileUploadService.listFile(fileUploadDTO);
+    @GetMapping("/product/detail")
+    public ResponseEntity<ProductDetail> productDetail(@RequestParam(name = "productId") String productId){    //
+        try {
+
+            long id = Long.parseLong(productId);    //useParams인한 String을 Long으로 변환
+            ProductDetail productDetail = productService.productDetail(id);
+            return ResponseEntity.ok(productDetail);
+        } catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+//    @GetMapping("/product/views")
+//    public void productViews(@RequestParam(name = "productId") String productId){
+//        long id = Long.parseLong(productId);    //useParams인한 String을 Long으로 변환
+//        productService.productViews(id);
 //    }
 }

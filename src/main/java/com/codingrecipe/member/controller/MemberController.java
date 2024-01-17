@@ -17,11 +17,6 @@ public class MemberController {
     // 생성자 주입
     private final MemberService memberService;
 
-    // 회원가입 페이지 출력 요청
-    @GetMapping("/user/register")
-    public String saveForm() {
-        return "save";
-    }
 
     @PostMapping("/user/register")    // user/register
     public String save(@RequestBody MemberDTO memberDTO) {

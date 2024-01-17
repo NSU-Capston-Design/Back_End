@@ -3,8 +3,7 @@ package com.codingrecipe.member.dto;
 import com.codingrecipe.member.entity.MemberEntity;
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString

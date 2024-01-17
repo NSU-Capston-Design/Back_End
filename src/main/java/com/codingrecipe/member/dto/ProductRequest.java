@@ -4,11 +4,11 @@ import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
-@Getter @Setter
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductRequest {
+public class ProductRequest {   // 사진 및 데이터를 받기 위한 DTO
 
     private MultipartFile file;
     private ProductData data;

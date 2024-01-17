@@ -22,6 +22,7 @@ public class ProductDTO {
     private int productPrice;   // 상품 가격
     private String productURL;  // 상품 이미지 저장 위치
     private int productInven;   // 재고수량
+    private int productView;    // 조회수
 
     private String userId;
     // 생성자, 게터 및 세터는 필요에 따라 추가할 수 있습니다.
@@ -44,6 +45,7 @@ public class ProductDTO {
 
     public static ProductDTO toFileDTO(ProductEntity productEntity){    // DTO 엔티티내용으로 업데이트
         ProductDTO fileUploadDTO = new ProductDTO();
+        fileUploadDTO.setProductId(productEntity.getId());
         fileUploadDTO.setProductName(productEntity.getProductName());
         fileUploadDTO.setFileSize(productEntity.getFileSize());
         fileUploadDTO.setFileType(productEntity.getFileType());
@@ -51,6 +53,7 @@ public class ProductDTO {
         fileUploadDTO.setProductPrice(productEntity.getProductPrice());
         fileUploadDTO.setProductURL(productEntity.getProductURL());
         fileUploadDTO.setProductInven(productEntity.getProductInven());
+        fileUploadDTO.setProductView(productEntity.getProductView());
         return fileUploadDTO;
     }
 }

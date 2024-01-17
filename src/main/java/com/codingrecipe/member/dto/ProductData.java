@@ -5,10 +5,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
 @Data
 @AllArgsConstructor
-public class ProductData {
+public class ProductData {          // Json데이터를 정의하기 위한 DTO
     private String productName;         // 상품명
     private int productPrice;           // 상품가격
     private String userName;            // 등록자 이름
