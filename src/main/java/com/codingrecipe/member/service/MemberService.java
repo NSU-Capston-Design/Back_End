@@ -70,10 +70,10 @@ public class MemberService {
 
     }
 
-    public MemberDTO updateForm(String myuserId) {
-        Optional<MemberEntity> optionalMemberEntity = memberRepository.findByUserId(myuserId);
-        if (optionalMemberEntity.isPresent()) {
-            return MemberDTO.toMemberDTO(optionalMemberEntity.get());
+    public MemberDTO updateForm(String userId) {
+        Optional<MemberEntity> memberEntity = memberRepository.findByUserId(userId);
+        if (memberEntity.get() != null) {
+            return MemberDTO.toMemberDTO(memberEntity.get());
         } else {
             return null;
         }
@@ -83,8 +83,14 @@ public class MemberService {
         memberRepository.save(MemberEntity.toUpdateMemberEntity(memberDTO));
     }
 
-    public void deleteById(Long id) {
-        memberRepository.deleteById(id);
+    public void deleteById(String userid) {
+        Optional<MemberEntity> findId = memberRepository.findByUserId(userid);
+        if (findId.isPresent()) {
+            Long id = findId.get().getId();
+            memberRepository.deleteById(id);
+        } else {
+            System.out.println("오류, 아이디를 찾을 수 없음" + userid);
+        }
     }
 
     public String idCheck(String userid) {
