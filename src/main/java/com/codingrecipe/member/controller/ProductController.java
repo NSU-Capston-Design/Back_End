@@ -62,9 +62,4 @@ public class ProductController {
         }
     }
 
-//    @GetMapping("/product/views")
-//    public void productViews(@RequestParam(name = "productId") String productId){
-//        long id = Long.parseLong(productId);    //useParams인한 String을 Long으로 변환
-//        productService.productViews(id);
-//    }
 }
