@@ -1,12 +1,25 @@
 package com.codingrecipe.member.controller;
 
+import com.codingrecipe.member.dto.ProductDTO;
+import com.codingrecipe.member.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
+@RequiredArgsConstructor
 @RestController
 public class HomeController {
 
-    /**
-     * 조회수에 따라 상품을 3개 가져오는 컨트롤러, 서비스 작성.
-     */
+    private final ProductService productService;
+
+    @GetMapping("/")    //조회수 상위 3개의 상품 가져옴.
+    public ResponseEntity<List<ProductDTO>> home(){
+        List<ProductDTO> topView = productService.findTopView();
+        return ResponseEntity.ok(topView);
+    }
+
+
 }

@@ -106,15 +106,17 @@ public class ProductService {
         }
     }
 
-//    public void productViews(Long id) throws EntityNotFoundException{
-//        Optional<ProductEntity> findId = productRepository.findById(id);
-//        if (findId.isPresent()){
-//            ProductEntity productEntity = findId.get();
-//            int findProductView = productEntity.getProductView();
-//            productEntity.setProductView(findProductView + 1);
-//        } else {
-//            throw new EntityNotFoundException("해당 상품을 찾을 수 없습니다.");
-//        }
-//    }
+    public List<ProductDTO> findTopView() {
+        List<ProductEntity> top3Product = productRepository.findTop3ByProductView();
+
+            List<ProductDTO> top3ProductDto = new ArrayList<>();
+
+            for (ProductEntity productEntity : top3Product) {
+                top3ProductDto.add(new ProductDTO(productEntity));
+            }
+
+            return top3ProductDto;
+
+    }
 
 }

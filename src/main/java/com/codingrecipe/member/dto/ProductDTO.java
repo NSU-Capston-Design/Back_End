@@ -43,6 +43,9 @@ public class ProductDTO {
         this.productInven = productInven;
     }
 
+    public ProductDTO(ProductEntity productEntity) {
+    }
+
     public static ProductDTO toFileDTO(ProductEntity productEntity){    // DTO 엔티티내용으로 업데이트
         ProductDTO fileUploadDTO = new ProductDTO();
         fileUploadDTO.setProductId(productEntity.getId());
