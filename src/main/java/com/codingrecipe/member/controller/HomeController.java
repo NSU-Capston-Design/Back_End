@@ -17,6 +17,7 @@ public class HomeController {
 
     @GetMapping("/")    //조회수 상위 3개의 상품 가져옴.
     public ResponseEntity<List<ProductDTO>> home(){
+        System.out.println(" 호출됨 ");
         List<ProductDTO> topView = productService.findTopView();
         return ResponseEntity.ok(topView);
     }

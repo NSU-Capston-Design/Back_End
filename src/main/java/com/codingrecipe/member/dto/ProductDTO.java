@@ -43,7 +43,16 @@ public class ProductDTO {
         this.productInven = productInven;
     }
 
-    public ProductDTO(ProductEntity productEntity) {
+    public ProductDTO(ProductEntity productEntity) {    // 엔티티를 DTO로 변환
+        this.productId = productEntity.getId();
+        this.productName = productEntity.getProductName();
+        this.fileSize = productEntity.getFileSize();
+        this.fileType = productEntity.getFileType();
+        this.uploadTime = productEntity.getUploadTime();
+        this.productPrice = productEntity.getProductPrice();
+        this.productURL = productEntity.getProductURL();
+        this.productInven = productEntity.getProductInven();
+        this.productView = productEntity.getProductView();
     }
 
     public static ProductDTO toFileDTO(ProductEntity productEntity){    // DTO 엔티티내용으로 업데이트

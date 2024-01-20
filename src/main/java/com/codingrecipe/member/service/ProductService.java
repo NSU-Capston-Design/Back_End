@@ -108,14 +108,19 @@ public class ProductService {
 
     public List<ProductDTO> findTopView() {
         List<ProductEntity> top3Product = productRepository.findTop3ByProductView();
+        List<ProductDTO> top3ProductDto = new ArrayList<>();
 
-            List<ProductDTO> top3ProductDto = new ArrayList<>();
 
-            for (ProductEntity productEntity : top3Product) {
-                top3ProductDto.add(new ProductDTO(productEntity));
-            }
+        for (int i = 0; i < 3; i++) {   // 스프링 데이터 JPA가 작동 안해서, 수동으로 넣어둠.
+            ProductEntity productEntity = top3Product.get(i);
+            top3ProductDto.add(new ProductDTO(productEntity));
+        }
 
-            return top3ProductDto;
+        System.out.println("top3Product = " + top3Product);
+
+        System.out.println("top3ProductDto = " + top3ProductDto);
+
+        return top3ProductDto;
 
     }
 
