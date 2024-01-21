@@ -26,8 +26,9 @@ upload:
     open-in-view: false
     show-sql: true
     format_sql: true
-    hibernate:
-      ddl-auto: update
+    properties:
+      hibernate:
+        hbm2ddl.auto: create
 
 logging:
   level:

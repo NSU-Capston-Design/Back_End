@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.context.annotation.Configuration;
 
 @SpringBootApplication
 public class MemberApplication {
@@ -12,6 +14,7 @@ public class MemberApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MemberApplication.class, args);
 	}
+
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {

@@ -1,10 +1,10 @@
-package com.codingrecipe.member.dto;
+package com.codingrecipe.member.dto.product;
 
+import com.codingrecipe.member.dto.member.MemberDTO;
+import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.entity.ProductEntity;
 import lombok.*;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @ToString
 public class ProductDTO {
 
-    private Long productId;
+    private Long fileId;
     private String productName; // 상품이름
     private long fileSize;  // 파일 사이즈
     private String fileType;    // 파일타입
@@ -24,7 +24,7 @@ public class ProductDTO {
     private int productInven;   // 재고수량
     private int productView;    // 조회수
 
-    private String userId;
+    private MemberEntity memberEntity;
     // 생성자, 게터 및 세터는 필요에 따라 추가할 수 있습니다.
 
     // ... Getter, Setter
@@ -32,7 +32,7 @@ public class ProductDTO {
 
     public ProductDTO(String productName, long fileSize,
                       String fileType, LocalDateTime uploadTime,
-                      int productPrice, String productURL, int productInven) {
+                      int productPrice, String productURL, int productInven, MemberEntity memberEntity) {
 
         this.productName = productName;
         this.fileSize = fileSize;
@@ -41,10 +41,11 @@ public class ProductDTO {
         this.productPrice = productPrice;
         this.productURL = productURL;
         this.productInven = productInven;
+        this.memberEntity = memberEntity;
     }
 
     public ProductDTO(ProductEntity productEntity) {    // 엔티티를 DTO로 변환
-        this.productId = productEntity.getId();
+        this.fileId = productEntity.getFileId();
         this.productName = productEntity.getProductName();
         this.fileSize = productEntity.getFileSize();
         this.fileType = productEntity.getFileType();
@@ -57,7 +58,7 @@ public class ProductDTO {
 
     public static ProductDTO toFileDTO(ProductEntity productEntity){    // DTO 엔티티내용으로 업데이트
         ProductDTO fileUploadDTO = new ProductDTO();
-        fileUploadDTO.setProductId(productEntity.getId());
+        fileUploadDTO.setFileId(productEntity.getFileId());
         fileUploadDTO.setProductName(productEntity.getProductName());
         fileUploadDTO.setFileSize(productEntity.getFileSize());
         fileUploadDTO.setFileType(productEntity.getFileType());
@@ -66,6 +67,7 @@ public class ProductDTO {
         fileUploadDTO.setProductURL(productEntity.getProductURL());
         fileUploadDTO.setProductInven(productEntity.getProductInven());
         fileUploadDTO.setProductView(productEntity.getProductView());
+        fileUploadDTO.setMemberEntity(productEntity.getMemberEntity());
         return fileUploadDTO;
     }
 }

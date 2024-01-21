@@ -1,7 +1,8 @@
 package com.codingrecipe.member.service;
 
-import com.codingrecipe.member.dto.MemberDTO;
+import com.codingrecipe.member.dto.member.MemberDTO;
 import com.codingrecipe.member.entity.MemberEntity;
+import com.codingrecipe.member.exception.NotFoundMemberException;
 import com.codingrecipe.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-    public void save(MemberDTO memberDTO) {
+    public String save(MemberDTO memberDTO) {
         // 1. dto -> entity 변환
         // 2. repository의 save 메서드 호출
         MemberEntity memberEntity = MemberEntity.toMemberEntity(memberDTO);
-        memberRepository.save(memberEntity);
-        // repository의 save메서드 호출 (조건. entity객체를 넘겨줘야 함)
+        MemberEntity save = memberRepository.save(memberEntity);
+
+        return save.getUserId();
+
     }
 
     public MemberDTO login(MemberDTO memberDTO) {
@@ -60,9 +63,7 @@ public class MemberService {
     public MemberDTO findById(Long id) {
         Optional<MemberEntity> optionalMemberEntity = memberRepository.findById(id);
         if (optionalMemberEntity.isPresent()) {
-//            MemberEntity memberEntity = optionalMemberEntity.get();
-//            MemberDTO memberDTO = MemberDTO.toMemberDTO(memberEntity);
-//            return memberDTO;
+
             return MemberDTO.toMemberDTO(optionalMemberEntity.get());
         } else {
             return null;
@@ -86,7 +87,7 @@ public class MemberService {
     public void deleteById(String userid) {
         Optional<MemberEntity> findId = memberRepository.findByUserId(userid);
         if (findId.isPresent()) {
-            Long id = findId.get().getId();
+            Long id = findId.get().getMemberId();
             memberRepository.deleteById(id);
         } else {
             System.out.println("오류, 아이디를 찾을 수 없음" + userid);
@@ -102,6 +103,14 @@ public class MemberService {
             // 조회결과가 없다 -> 사용할 수 있다.
             return "ok";
         }
+    }
+
+    public Optional<MemberEntity> findByMemberId(Long id) throws NotFoundMemberException {
+        Optional<MemberEntity> memberId = memberRepository.findById(id);
+        if (memberId.isPresent()){
+            return memberId;
+        }
+        throw new NotFoundMemberException();
     }
 
 }

@@ -1,11 +1,9 @@
 package com.codingrecipe.member.controller;
 
-import com.codingrecipe.member.dto.MemberDTO;
+import com.codingrecipe.member.dto.member.MemberDTO;
 import com.codingrecipe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,13 +18,14 @@ public class MemberController {
 
 
     @PostMapping("/user/register")    //
-    public void save(@RequestBody MemberDTO memberDTO) {
-        memberService.save(memberDTO);
+    public ResponseEntity<String> save(@RequestBody MemberDTO memberDTO) {
+        String save = memberService.save(memberDTO);
 
+        return ResponseEntity.ok("회원가입 성공 \n" + "아이디: " + save);
     }
 
     @PostMapping("/user/login")            //user/login
-    public ResponseEntity<String> login(@RequestBody MemberDTO memberDTO, HttpServletRequest request) {
+    public ResponseEntity<Integer> login(@RequestBody MemberDTO memberDTO, HttpServletRequest request) {
         MemberDTO loginResult = memberService.login(memberDTO);
         if (loginResult != null) {
             // login 성공시 세션 부여
@@ -34,7 +33,14 @@ public class MemberController {
             session.setAttribute("userId", loginResult.getUserId());
             System.out.println("session = " + session);
 
-            return ResponseEntity.ok("로그인 성공");
+            System.out.println("loginResult = " + loginResult.getMemberId());
+
+            Long longValue = loginResult.getMemberId();
+            int memberId = longValue.intValue();
+
+            System.out.println("memberId = " + memberId);
+
+            return ResponseEntity.ok(memberId);
         } else {
             // login 실패
             return ResponseEntity.badRequest().build();
@@ -95,8 +101,6 @@ public class MemberController {
         memberService.deleteById(userId);
         return ResponseEntity.ok("삭제 완료");
     }
-
-
 
     @PostMapping("/user/idcheck")     //user/user_id-check
     public ResponseEntity<String> idCheck(@RequestParam("userId") String userid) {

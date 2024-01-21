@@ -1,14 +1,9 @@
 package com.codingrecipe.member.controller;
 
-import com.codingrecipe.member.dto.ProductDTO;
-import com.codingrecipe.member.dto.ProductData;
-import com.codingrecipe.member.dto.ProductDetail;
-import com.codingrecipe.member.dto.ProductRequest;
+import com.codingrecipe.member.dto.product.*;
 import com.codingrecipe.member.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +29,7 @@ public class ProductController {
             productRequest.setData(data);
             productService.uploadFile(productRequest);
 
-            return ResponseEntity.ok("등록 성공!");
+            return ResponseEntity.ok("등록 성공! \n" + data.getMemberId());
         } catch (Exception e){
 
             return ResponseEntity.status(500).body("상품 등록 실패...");
@@ -42,16 +37,17 @@ public class ProductController {
 
     }
 
-    @GetMapping("/product/list")
-    public ResponseEntity<List<ProductDTO>> findAll() {
-        List<ProductDTO> fileDTOList = productService.productList();
-        // 어떠한 html로 가져갈 데이터가 있다면 model 사용
+    @GetMapping("/product/list")            // 상품 리스트 출력
+    public ResponseEntity<List<ProductListDTO>> findAll() {
+        List<ProductListDTO> fileDTOList = productService.productList();
 
         return ResponseEntity.ok(fileDTOList);
-    } // 관리자모드 회원목록
+    }
+
+    // 관리자모드 회원목록 제작필요
 
     @GetMapping("/product/detail")
-    public ResponseEntity<ProductDetail> productDetail(@RequestParam(name = "productId") String productId){    //
+    public ResponseEntity<ProductDetail> productDetail(@RequestParam(name = "productId") String productId){
         try {
 
             long id = Long.parseLong(productId);    //useParams인한 String을 Long으로 변환
