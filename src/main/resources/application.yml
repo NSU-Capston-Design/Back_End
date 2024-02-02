@@ -13,12 +13,12 @@ spring:
     url: jdbc:mysql://localhost:3306/member?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
 #    mysql에 생성한 사용자 계정 정보를 써야 합니다.
     username: root
-    password: 1229
+    password: 1234
   thymeleaf:
     cache: false
 
 upload:
-  dir: "C:/Users/dlaco/Desktop/캡스톤 프로젝트/Back_End/src/main/resources/static/photos/postPhoto"
+  dir: "C:/Users/1111/Desktop/Back_End/src/main/resources/static/photos/postPhoto"
 
   # spring data jpa 설정
   jpa:

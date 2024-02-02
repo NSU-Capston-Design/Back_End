@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>Insert title here</title>
+</head>
+<body>
+<div id="page">
+  <header th:replace="/fragments/header.html">
+  </header>
+  <nav th:replace="/fragments/nav.html">
+  </nav>
+  <div id="main">
+    <aside th:replace="/fragments/aside.html">
+    </aside>
+    <section>
+      <div th:text="${order}"></div>
+      <h1>주문이 완료되었습니다! (๑ᵔ⩊ᵔ๑)</h1>
+      <a class="btn btn-info" href="/order/list">주문 정보 보기</a>
+    </section>
+  </div>
+  <footer th:replace="/fragments/footer.html">
+  </footer>
+</div>
+</body>
+</html>
