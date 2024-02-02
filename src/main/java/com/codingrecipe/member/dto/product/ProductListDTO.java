@@ -12,7 +12,7 @@ public class ProductListDTO {
 
     private Long fileId;
     private String productName;
-    private LocalDateTime uploadTime;
+    private String uploadTime;
     private int productPrice;
     private String productURL;
     private int productInven;

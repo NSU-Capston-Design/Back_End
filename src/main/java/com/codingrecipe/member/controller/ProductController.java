@@ -47,10 +47,10 @@ public class ProductController {
     // 관리자모드 회원목록 제작필요
 
     @GetMapping("/product/detail")
-    public ResponseEntity<ProductDetail> productDetail(@RequestParam(name = "productId") String productId){
+    public ResponseEntity<ProductDetail> productDetail(@RequestParam(name = "fileId") String fileId){
         try {
 
-            long id = Long.parseLong(productId);    //useParams인한 String을 Long으로 변환
+            long id = Long.parseLong(fileId);    //useParams인한 String을 Long으로 변환
             ProductDetail productDetail = productService.productDetail(id);
             return ResponseEntity.ok(productDetail);
         } catch (EntityNotFoundException e){

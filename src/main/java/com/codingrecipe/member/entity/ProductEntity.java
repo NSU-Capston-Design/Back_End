@@ -27,7 +27,7 @@ public class ProductEntity {
     private String fileType;        // 파일 타입 (jpg, png 같은)
 
     @Column
-    private LocalDateTime uploadTime;   // 업로드 시간
+    private String uploadTime;   // 업로드 시간
 
     @Column
     private int productPrice;       // 상품 가격

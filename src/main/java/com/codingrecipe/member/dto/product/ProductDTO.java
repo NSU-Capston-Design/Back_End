@@ -18,7 +18,7 @@ public class ProductDTO {
     private String productName; // 상품이름
     private long fileSize;  // 파일 사이즈
     private String fileType;    // 파일타입
-    private LocalDateTime uploadTime;   // 업로드 시간
+    private String uploadTime;   // 업로드 시간
     private int productPrice;   // 상품 가격
     private String productURL;  // 상품 이미지 저장 위치
     private int productInven;   // 재고수량
@@ -31,7 +31,7 @@ public class ProductDTO {
 
 
     public ProductDTO(String productName, long fileSize,
-                      String fileType, LocalDateTime uploadTime,
+                      String fileType, String uploadTime,
                       int productPrice, String productURL, int productInven, MemberEntity memberEntity) {
 
         this.productName = productName;

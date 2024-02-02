@@ -10,6 +10,7 @@ import com.codingrecipe.member.entity.ProductEntity;
 import com.codingrecipe.member.exception.NotFoundMemberException;
 import com.codingrecipe.member.exception.NotFoundProductException;
 import com.codingrecipe.member.repository.ProductRepository;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,11 +35,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final MemberService memberService;
 
-//    @Autowired
-//    private MemberRepository memberRepository;
-
-
-    @Value("${upload.dir}")
+    @Value("${upload.dir}" + "postPhoto")
     private String uploadDir;
 
 
@@ -48,6 +47,10 @@ public class ProductService {
             int price = productRequest.getData().getProductPrice();
             int productInven = productRequest.getData().getProductInven();
             MemberEntity byMemberId = memberService.findByMemberId(productRequest.getData().getMemberId()).get();
+
+            Date currentDate = new Date(); // 현재 시간
+            SimpleDateFormat format = new SimpleDateFormat("yy년/MM월/dd일 - HH:mm"); // 형식 변환
+            String date = format.format(currentDate);   // 변환한 날짜 저장
 
             String originProductName = produtName;
             String replaceProductName = originProductName.replaceAll("\\s", "_");   // 공백을 언더바로 치환
@@ -61,7 +64,7 @@ public class ProductService {
 
 
             ProductDTO fileUploadDTO = new ProductDTO(produtName, file.getSize(),
-                    file.getContentType(), LocalDateTime.now(), price, filePath, productInven, byMemberId);
+                    file.getContentType(), date, price, filePath, productInven, byMemberId);
 
 
             // DTO에서 엔터티로 변환

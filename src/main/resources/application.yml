@@ -18,7 +18,7 @@ spring:
     cache: false
 
 upload:
-  dir: "C:/Users/dlaco/Desktop/캡스톤 프로젝트/Back_End/src/main/resources/static/photos/postPhoto"
+  dir: "C:/Users/dlaco/Desktop/캡스톤 프로젝트/Back_End/src/main/resources/static/photos/"
 
   # spring data jpa 설정
   jpa:
