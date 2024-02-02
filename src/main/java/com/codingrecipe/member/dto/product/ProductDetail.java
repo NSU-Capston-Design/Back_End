@@ -1,4 +1,4 @@
-package com.codingrecipe.member.dto;
+package com.codingrecipe.member.dto.product;
 
 import com.codingrecipe.member.entity.ProductEntity;
 import lombok.Data;
@@ -11,11 +11,12 @@ import java.time.LocalDateTime;
 public class ProductDetail {    // 상품 상세페이지를 위한 DTO
 
     private String productName;
-    private LocalDateTime uploadTime;
+    private String uploadTime;
     private int productPrice;
     private String productURL;
     private int productInven;
     private int productView;
+    private String userName;
 
     public ProductDetail(ProductEntity productEntity) {
         this.productName = productEntity.getProductName();

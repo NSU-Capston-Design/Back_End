@@ -1,10 +1,9 @@
 package com.codingrecipe.member.controller;
 
-import com.codingrecipe.member.dto.MemberDTO;
+import com.codingrecipe.member.dto.member.MemberDTO;
 import com.codingrecipe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,85 +17,98 @@ public class MemberController {
     private final MemberService memberService;
 
 
-    @PostMapping("/user/register")    // user/register
-    public String save(@RequestBody MemberDTO memberDTO) {
-        System.out.println("MemberController.save");
-        System.out.println("memberDTO = " + memberDTO);
-        memberService.save(memberDTO);
-        return "login";
-    }
+    @PostMapping("/user/register")    //
+    public ResponseEntity<String> save(@RequestBody MemberDTO memberDTO) {
+        String save = memberService.save(memberDTO);
 
-    @GetMapping("/user/login")
-    public String loginForm() {
-        return "login";
+        return ResponseEntity.ok("회원가입 성공 \n" + "아이디: " + save);
     }
 
     @PostMapping("/user/login")            //user/login
-    public String login(@RequestBody MemberDTO memberDTO, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<Integer> login(@RequestBody MemberDTO memberDTO, HttpServletRequest request) {
         MemberDTO loginResult = memberService.login(memberDTO);
         if (loginResult != null) {
             // login 성공시 세션 부여
-            HttpSession session = httpServletRequest.getSession();  // 세션 생성
+            HttpSession session = request.getSession();  // 세션 생성
             session.setAttribute("userId", loginResult.getUserId());
             System.out.println("session = " + session);
-            return "/mainpage";
+
+            System.out.println("loginResult = " + loginResult.getMemberId());
+
+            Long longValue = loginResult.getMemberId();
+            int memberId = longValue.intValue();
+
+            System.out.println("memberId = " + memberId);
+
+            return ResponseEntity.ok(memberId);
         } else {
             // login 실패
-            System.out.println("loginResult = " + loginResult);
-            return "login";
+            return ResponseEntity.badRequest().build();
         }
     }
 
-    @GetMapping("/user")
-    public String findAll(Model model) {
-        List<MemberDTO> memberDTOList = memberService.findAll();
-        // 어떠한 html로 가져갈 데이터가 있다면 model 사용
-        model.addAttribute("memberList", memberDTOList);
-        return "list";
-    } // 관리자모드 회원목록
-
-    @GetMapping("/user/{id}")     // 아이디로 마이페이지 찾기? user/{id}
-    public String findById(@PathVariable Long id, Model model) {
-        MemberDTO memberDTO = memberService.findById(id);
-        model.addAttribute("member", memberDTO);
-        return "detail";
+    @PostMapping("/user/logout")   // user/logout 세션 삭제
+    public ResponseEntity<?> logout(HttpServletRequest request) {   // <?> 제네릭 와일드카드
+        HttpSession session = request.getSession(false);
+        if(session != null) {
+            session.invalidate();
+            return ResponseEntity.ok("로그아웃 및 세션삭제");
+        }
+        return ResponseEntity.badRequest().build();
     }
 
-    @GetMapping("/user/update")
-    public String updateForm(HttpSession session, Model model) {
-        String myuserId = (String) session.getAttribute("loginuserId");
-        MemberDTO memberDTO = memberService.updateForm(myuserId);
-        model.addAttribute("updateMember", memberDTO);
-        return "update";
+    @GetMapping("/user")        // 관리자모드용 회원목록
+    public ResponseEntity<List<MemberDTO>> findAll() {
+        List<MemberDTO> memberDTOList = memberService.findAll();
+        if (memberDTOList != null) {
+            return ResponseEntity.ok(memberDTOList);
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/user/id")     // 마이페이지
+    public ResponseEntity<MemberDTO> findById(@RequestParam Long id) {
+        MemberDTO memberDTO = memberService.findById(id);
+        if (memberDTO != null) {
+            return ResponseEntity.ok(memberDTO);
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/user/update")    // 회원정보 업데이트 폼(원래 있던 데이터만 꺼내줌)
+    public ResponseEntity<MemberDTO> updateForm(HttpSession session) {
+        String userId = (String) session.getAttribute("userId");
+        MemberDTO memberDTO = memberService.updateForm(userId);
+        if (memberDTO != null) {
+            return ResponseEntity.ok(memberDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/user/update")  //업데이트 된 내용으로 이루어진 멤버페이지를 보여줌
-    public String update(@RequestBody MemberDTO memberDTO) {
-        memberService.update(memberDTO);
-        return "redirect:/user/" + memberDTO.getId();
+    public ResponseEntity<String> update(@RequestBody MemberDTO memberDTO) {
+        try {
+            memberService.update(memberDTO);
+            return ResponseEntity.ok("수정 완료");
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @GetMapping("/user/delete/{id}")  //user/delete/{id} 지금 id는 인덱스값이라 현재 erd 테이블에 없음 추가하는걸로
-    public String deleteById(@PathVariable Long id) {
-        memberService.deleteById(id);
-        return "redirect:/user/";
+    @GetMapping("/user/delete/{userId}")  //user/delete/{id} 지금 id는 인덱스값이라 현재 erd 테이블에 없음 추가하는걸로
+    public ResponseEntity<String> deleteById(@PathVariable("userId") String userId) {
+        memberService.deleteById(userId);
+        return ResponseEntity.ok("삭제 완료");
     }
 
-    @PostMapping("/user/logout")   // user/logout 세션 삭제
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/";
-    }
-
-    @PostMapping("/user/userid-check")     //user/user_id-check
-    public @ResponseBody String idCheck(@RequestBody String userid) {
+    @PostMapping("/user/idcheck")     //user/user_id-check
+    public ResponseEntity<String> idCheck(@RequestParam("userId") String userid) {
         System.out.println("userid = " + userid);
-        return memberService.idCheck(userid);
-//        if (checkResult != null) {
-//            return "ok";
-//        } else {
-//            return "no";
-//        }
+        String checkResult = memberService.idCheck(userid);
+        if (checkResult != null){
+            return ResponseEntity.ok(checkResult);
+        } return ResponseEntity.badRequest().build();
     }
 
 }

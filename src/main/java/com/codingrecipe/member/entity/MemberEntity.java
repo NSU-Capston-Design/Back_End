@@ -1,6 +1,6 @@
 package com.codingrecipe.member.entity;
 
-import com.codingrecipe.member.dto.MemberDTO;
+import com.codingrecipe.member.dto.member.MemberDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class MemberEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long memberId;
 
     @Column(unique = true)
     private String userId;
@@ -51,7 +51,7 @@ public class MemberEntity {
 
     public static MemberEntity toUpdateMemberEntity(MemberDTO memberDTO) {
         MemberEntity memberEntity = new MemberEntity();
-        memberEntity.setId(memberDTO.getId());
+        memberEntity.setMemberId(memberDTO.getMemberId());
         memberEntity.setUserId(memberDTO.getUserId());
         memberEntity.setUserEmail(memberDTO.getUserEmail());
         memberEntity.setUserPassword(memberDTO.getUserPassword());

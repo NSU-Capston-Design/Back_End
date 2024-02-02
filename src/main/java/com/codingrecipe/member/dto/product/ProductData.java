@@ -1,0 +1,20 @@
+package com.codingrecipe.member.dto.product;
+
+import com.codingrecipe.member.entity.MemberEntity;
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+public class ProductData {          // Json데이터를 정의하기 위한 DTO
+    private String productName;         // 상품명
+    private int productPrice;           // 상품가격
+    private int productInven;           // 재고수량
+    private Long memberId;          // 작성자 id
+
+    public ProductData(String productName, int productPrice, int productInven, int memberId) {
+        this.productName = productName;
+        this.productPrice = productPrice;
+        this.productInven = productInven;
+        this.memberId = (long)memberId;
+    }
+}

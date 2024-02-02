@@ -1,7 +1,6 @@
 package com.codingrecipe.member.entity;
 
-import com.codingrecipe.member.dto.MemberDTO;
-import com.codingrecipe.member.dto.ProductDTO;
+import com.codingrecipe.member.dto.product.ProductDTO;
 import lombok.*;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,23 +11,23 @@ import java.time.LocalDateTime;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "uploaded_file")
+@Table(name = "product_table")
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;        // 상품 아이디
+    private Long fileId;        // 상품 아이디
 
     @Column
     private String productName;     // 상품 이름
 
     @Column
-    private long fileSize;          // 상품 사진 크기
+    private long fileSize;          // 사진 크기
 
     @Column
     private String fileType;        // 파일 타입 (jpg, png 같은)
 
     @Column
-    private LocalDateTime uploadTime;   // 업로드 시간
+    private String uploadTime;   // 업로드 시간
 
     @Column
     private int productPrice;       // 상품 가격
@@ -44,7 +43,7 @@ public class ProductEntity {
 
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "member_id")
     private MemberEntity memberEntity;
 
     @Transactional
@@ -56,6 +55,8 @@ public class ProductEntity {
         this.uploadTime = productDTO.getUploadTime();
         this.productPrice = productDTO.getProductPrice();
         this.productURL = productDTO.getProductURL();
+        this.memberEntity = productDTO.getMemberEntity();
+
     }
 
 }

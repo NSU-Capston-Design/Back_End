@@ -1,4 +1,4 @@
-package com.codingrecipe.member.dto;
+package com.codingrecipe.member.dto.member;
 
 import com.codingrecipe.member.entity.MemberEntity;
 import lombok.*;
@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class MemberDTO {
-    private Long id;
+    private Long memberId;
     private String userId;
     private String userEmail;
     private String userPassword;
@@ -18,7 +18,7 @@ public class MemberDTO {
 
     public static MemberDTO toMemberDTO(MemberEntity memberEntity) {
         MemberDTO memberDTO = new MemberDTO();
-        memberDTO.setId(memberEntity.getId());
+        memberDTO.setMemberId(memberEntity.getMemberId());
         memberDTO.setUserId(memberEntity.getUserId());
         memberDTO.setUserEmail(memberEntity.getUserEmail());
         memberDTO.setUserPassword(memberEntity.getUserPassword());

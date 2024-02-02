@@ -18,7 +18,11 @@ spring:
     cache: false
 
 upload:
+<<<<<<< HEAD
   dir: "C:/Users/1111/Desktop/Back_End/src/main/resources/static/photos/postPhoto"
+=======
+  dir: "C:/Users/dlaco/Desktop/캡스톤 프로젝트/Back_End/src/main/resources/static/photos/"
+>>>>>>> 533ae5d5229cc969c93444714a5b298ecb13a0a8
 
   # spring data jpa 설정
   jpa:
@@ -26,8 +30,9 @@ upload:
     open-in-view: false
     show-sql: true
     format_sql: true
-    hibernate:
-      ddl-auto: update
+    properties:
+      hibernate:
+        hbm2ddl.auto: create
 
 logging:
   level:

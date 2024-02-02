@@ -1,4 +1,4 @@
-package com.codingrecipe.member.dto;
+package com.codingrecipe.member.dto.product;
 
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
