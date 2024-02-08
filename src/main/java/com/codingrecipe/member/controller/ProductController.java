@@ -1,21 +1,23 @@
 package com.codingrecipe.member.controller;
 
 import com.codingrecipe.member.dto.product.*;
+import com.codingrecipe.member.exception.NotFoundProductException;
 import com.codingrecipe.member.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;
-
+    private final ProductService productService;
 
     @PostMapping(value = "/upload")
     public ResponseEntity<String> handleFileUpload(@RequestPart(value = "file") MultipartFile file,
@@ -37,7 +39,10 @@ public class ProductController {
 
     }
 
-    @GetMapping("/product/list")            // 상품 리스트 출력
+    /**
+     * 상품 전체리스트
+     */
+    @GetMapping("/product/list")
     public ResponseEntity<List<ProductListDTO>> findAll() {
         List<ProductListDTO> fileDTOList = productService.productList();
 
@@ -46,6 +51,9 @@ public class ProductController {
 
     // 관리자모드 회원목록 제작필요
 
+    /**
+     * 상품 상세리스트
+     */
     @GetMapping("/product/detail")
     public ResponseEntity<ProductDetail> productDetail(@RequestParam(name = "fileId") String fileId){
         try {
@@ -55,6 +63,26 @@ public class ProductController {
             return ResponseEntity.ok(productDetail);
         } catch (EntityNotFoundException e){
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * 상품 장바구니 리스트
+     */
+    @GetMapping("/product/buyList")
+    public ResponseEntity<List<ProductBuyListDTO>> findBuyList(@RequestParam(name = "fileIds") String ...fileId){
+        try {
+            long[] id = new long[fileId.length];
+            for (int i = 0; i < fileId.length; i++){
+                id[i] = Long.parseLong(fileId[i]);    //useParams인한 String을 Long으로 변환
+            }
+            List<ProductBuyListDTO> allByProductId = productService.findAllByProductId(id);
+
+            return ResponseEntity.ok(allByProductId);
+        } catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
+        } catch (NotFoundProductException e) {
+            throw new RuntimeException(e);
         }
     }
 

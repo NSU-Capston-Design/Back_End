@@ -1,16 +1,12 @@
 package com.codingrecipe.member.service;
 
-import com.codingrecipe.member.dto.member.MemberDTO;
-import com.codingrecipe.member.dto.product.ProductDTO;
-import com.codingrecipe.member.dto.product.ProductDetail;
-import com.codingrecipe.member.dto.product.ProductListDTO;
-import com.codingrecipe.member.dto.product.ProductRequest;
+import com.codingrecipe.member.dto.product.*;
+import com.codingrecipe.member.entity.Category;
 import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.entity.ProductEntity;
 import com.codingrecipe.member.exception.NotFoundMemberException;
 import com.codingrecipe.member.exception.NotFoundProductException;
 import com.codingrecipe.member.repository.ProductRepository;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,7 +17,6 @@ import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,15 +33,17 @@ public class ProductService {
     @Value("${upload.dir}" + "postPhoto")
     private String uploadDir;
 
-
-
-    public String uploadFile(ProductRequest productRequest) {          // 파일을 매개변수로 받음
+    /**
+     * 파일 업로드
+     */
+    public void uploadFile(ProductRequest productRequest) {          // 파일을 매개변수로 받음
         try {
             MultipartFile file = productRequest.getFile();
             String produtName = productRequest.getData().getProductName();
             int price = productRequest.getData().getProductPrice();
             int productInven = productRequest.getData().getProductInven();
             MemberEntity byMemberId = memberService.findByMemberId(productRequest.getData().getMemberId()).get();
+            Category category = getCategory(productRequest);    // 카테고리 뽑기
 
             Date currentDate = new Date(); // 현재 시간
             SimpleDateFormat format = new SimpleDateFormat("yy년/MM월/dd일 - HH:mm"); // 형식 변환
@@ -64,7 +61,7 @@ public class ProductService {
 
 
             ProductDTO fileUploadDTO = new ProductDTO(produtName, file.getSize(),
-                    file.getContentType(), date, price, filePath, productInven, byMemberId);
+                    file.getContentType(), date, price, filePath, productInven, byMemberId, category);
 
 
             // DTO에서 엔터티로 변환
@@ -75,15 +72,41 @@ public class ProductService {
             // 엔터티 저장
             productRepository.save(uploadedFile);
 
-
-            return "파일 업로드 성공!\n" + "상품이름: " + produtName + ", 상품가격: " + price + ", 사용자: " + byMemberId;
+            System.out.println("uploadedFile = " + uploadedFile);
         } catch (IOException e) {
-            return "Failed to upload file!";
+            System.out.println("e = " + e);
         } catch (NotFoundMemberException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * 카테고리 메서드
+     */
+    private static Category getCategory(ProductRequest productRequest) {
+        String categories = productRequest.getData().getCategory();
+        Category category = Category.DEFAULT;
+        if (categories.equals("TOP")){
+            category = Category.TOP;
+        } else if (categories.equals("PANTS")) {
+            category = Category.PANTS;
+        } else if(categories.equals("SHOES")){
+            category = Category.SHOES;
+        } else if(categories.equals("BAG")){
+            category = Category.BAG;
+        } else if(categories.equals("ELECTRONICS")){
+            category = Category.ELECTRONICS;
+        } else {
+            if (categories.isEmpty()){
+                throw new NullPointerException("입력된 값이 없습니다.");
+            }
+        }
+        return category;
+    }
+
+    /**
+     * @return 상품 리스트
+     */
     public List<ProductListDTO> productList(){      // 상품 리스트 반환하기
         List<ProductEntity> fileEntityList = productRepository.findAll();
         List<ProductListDTO> fileDTOList = new ArrayList<>();
@@ -97,6 +120,10 @@ public class ProductService {
         return fileDTOList;
     }
 
+    /**
+     * 상품 디테일
+     * 동작할 때, 조회수가 하나 올라감
+     */
     public ProductDetail productDetail(Long id) throws EntityNotFoundException { // 조회수 업데이트 및 상품 디테일
         Optional<ProductEntity> findId = productRepository.findById(id);
         if(findId.isPresent()) {
@@ -110,6 +137,9 @@ public class ProductService {
         }
     }
 
+    /**
+     * 조회수 순으로 상품 3개를 가져옴(메인화면에 쓰이는 용도)
+     */
     public List<ProductDTO> findTopView() throws NotFoundProductException {
         List<ProductEntity> top3Product = productRepository.findTop3ByProductView();
         List<ProductDTO> top3ProductDto = new ArrayList<>();
@@ -128,7 +158,24 @@ public class ProductService {
         System.out.println("top3ProductDto = " + top3ProductDto);
 
         return top3ProductDto;
+    }
 
+    /**
+     * 상품 id들을 받아서 가져옴(장바구니)
+     */
+    public List<ProductBuyListDTO> findAllByProductId(long[] productId) throws NotFoundProductException {
+        List<ProductEntity> allByProductId = productRepository.findAllByProductId(productId);
+        if (allByProductId.isEmpty()){
+            throw new NotFoundProductException("없는 상품 ID입니다.");
+        }
+        List<ProductBuyListDTO> allByProductIdDto = new ArrayList<>();
+
+        for (ProductEntity productEntity : allByProductId){
+            ProductBuyListDTO productDTO = new ProductBuyListDTO(productEntity);
+
+            allByProductIdDto.add(productDTO);
+        }
+        return allByProductIdDto;
     }
 
 }
