@@ -54,12 +54,11 @@ public class ProductController {
     /**
      * 상품 상세리스트
      */
-    @GetMapping("/product/detail")
-    public ResponseEntity<ProductDetail> productDetail(@RequestParam(name = "fileId") String fileId){
+    @GetMapping("/product/{fileId}")
+    public ResponseEntity<ProductDetail> productDetail(@PathVariable(name = "fileId") int fileId){
         try {
 
-            long id = Long.parseLong(fileId);    //useParams인한 String을 Long으로 변환
-            ProductDetail productDetail = productService.productDetail(id);
+            ProductDetail productDetail = productService.productDetail((long) fileId);
             return ResponseEntity.ok(productDetail);
         } catch (EntityNotFoundException e){
             return ResponseEntity.notFound().build();
@@ -70,11 +69,11 @@ public class ProductController {
      * 상품 장바구니 리스트
      */
     @GetMapping("/product/buyList")
-    public ResponseEntity<List<ProductBuyListDTO>> findBuyList(@RequestParam(name = "fileIds") String ...fileId){
+    public ResponseEntity<List<ProductBuyListDTO>> findBuyList(@RequestParam(name = "fileIds") List<Integer> fileIds){
         try {
-            long[] id = new long[fileId.length];
-            for (int i = 0; i < fileId.length; i++){
-                id[i] = Long.parseLong(fileId[i]);    //useParams인한 String을 Long으로 변환
+            long[] id = new long[fileIds.size()];
+            for (int i = 0; i < fileIds.size(); i++){
+                id[i] = fileIds.get(i).longValue();    //useParam인한 int Long으로 변환
             }
             List<ProductBuyListDTO> allByProductId = productService.findAllByProductId(id);
 

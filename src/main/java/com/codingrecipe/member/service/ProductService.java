@@ -46,7 +46,7 @@ public class ProductService {
             Category category = getCategory(productRequest);    // 카테고리 뽑기
 
             Date currentDate = new Date(); // 현재 시간
-            SimpleDateFormat format = new SimpleDateFormat("yy년/MM월/dd일 - HH:mm"); // 형식 변환
+            SimpleDateFormat format = new SimpleDateFormat("yy/MM/dd - HH:mm"); // 형식 변환
             String date = format.format(currentDate);   // 변환한 날짜 저장
 
             String originProductName = produtName;
@@ -144,13 +144,23 @@ public class ProductService {
         List<ProductEntity> top3Product = productRepository.findTop3ByProductView();
         List<ProductDTO> top3ProductDto = new ArrayList<>();
 
-
-        for (int i = 0; i < 3; i++) {   // 스프링 데이터 JPA가 작동 안해서, 수동으로 넣어둠.
-            ProductEntity productEntity = top3Product.get(i);
-            if(productEntity == null){
-                throw new NotFoundProductException("상품이 없습니다.");
+        if (top3Product.size() < 3){
+            for (int i = 0; i < top3Product.size(); i++){
+                ProductEntity productEntity = top3Product.get(i);
+                if(productEntity == null){
+                    throw new NotFoundProductException("상품이 없습니다.");
+                }
+                top3ProductDto.add(new ProductDTO(productEntity));
             }
-            top3ProductDto.add(new ProductDTO(productEntity));
+        }
+        else {
+            for (int i = 0; i < 3; i++) {   // 스프링 데이터 JPA가 작동 안해서, 수동으로 넣어둠.
+                ProductEntity productEntity = top3Product.get(i);
+                if (productEntity == null) {
+                    throw new NotFoundProductException("상품이 없습니다.");
+                }
+                top3ProductDto.add(new ProductDTO(productEntity));
+            }
         }
 
         System.out.println("top3Product = " + top3Product);

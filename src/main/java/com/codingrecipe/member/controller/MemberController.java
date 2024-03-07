@@ -1,6 +1,7 @@
 package com.codingrecipe.member.controller;
 
 import com.codingrecipe.member.dto.member.MemberDTO;
+import com.codingrecipe.member.dto.member.UserIdDTO;
 import com.codingrecipe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,10 @@ public class MemberController {
     // 생성자 주입
     private final MemberService memberService;
 
-
-    @PostMapping("/user/register")    //
+    /**
+     * 회원가입
+     */
+    @PostMapping("/user/register")
     public ResponseEntity<String> save(@RequestBody MemberDTO memberDTO) {
         String save = memberService.save(memberDTO);
 
@@ -57,7 +60,7 @@ public class MemberController {
         return ResponseEntity.badRequest().build();
     }
 
-    @GetMapping("/user")        // 관리자모드용 회원목록
+    @GetMapping("/users")        // 관리자모드용 회원목록
     public ResponseEntity<List<MemberDTO>> findAll() {
         List<MemberDTO> memberDTOList = memberService.findAll();
         if (memberDTOList != null) {
@@ -66,19 +69,18 @@ public class MemberController {
         return ResponseEntity.badRequest().build();
     }
 
-    @GetMapping("/user/id")     // 마이페이지
-    public ResponseEntity<MemberDTO> findById(@RequestParam Long id) {
-        MemberDTO memberDTO = memberService.findById(id);
+    @GetMapping("/user/{id}")     // 마이페이지
+    public ResponseEntity<MemberDTO> findById(@PathVariable(name = "id") int id) {
+        MemberDTO memberDTO = memberService.findById((long)id);
         if (memberDTO != null) {
             return ResponseEntity.ok(memberDTO);
         }
         return ResponseEntity.badRequest().build();
     }
 
-    @GetMapping("/user/update")    // 회원정보 업데이트 폼(원래 있던 데이터만 꺼내줌)
-    public ResponseEntity<MemberDTO> updateForm(HttpSession session) {
-        String userId = (String) session.getAttribute("userId");
-        MemberDTO memberDTO = memberService.updateForm(userId);
+    @GetMapping("/user")    // 회원정보 업데이트 폼(원래 있던 데이터만 꺼내줌)
+    public ResponseEntity<MemberDTO> updateForm(@RequestBody UserIdDTO userIdDTO) {
+        MemberDTO memberDTO = memberService.updateForm(userIdDTO.getUserId());
         if (memberDTO != null) {
             return ResponseEntity.ok(memberDTO);
         } else {

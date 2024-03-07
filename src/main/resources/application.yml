@@ -28,7 +28,7 @@ upload:
     format_sql: true
     properties:
       hibernate:
-        hbm2ddl.auto: create
+        hbm2ddl.auto: create-auto
 
 logging:
   level:
