@@ -1,6 +1,7 @@
 package com.codingrecipe.member.dto.product;
 
 import com.codingrecipe.member.dto.member.MemberDTO;
+import com.codingrecipe.member.entity.Category;
 import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.entity.ProductEntity;
 import lombok.*;
@@ -25,14 +26,12 @@ public class ProductDTO {
     private int productView;    // 조회수
 
     private MemberEntity memberEntity;
-    // 생성자, 게터 및 세터는 필요에 따라 추가할 수 있습니다.
 
-    // ... Getter, Setter
-
+    private Category category;
 
     public ProductDTO(String productName, long fileSize,
                       String fileType, String uploadTime,
-                      int productPrice, String productURL, int productInven, MemberEntity memberEntity) {
+                      int productPrice, String productURL, int productInven, MemberEntity memberEntity, Category category) {
 
         this.productName = productName;
         this.fileSize = fileSize;
@@ -42,6 +41,7 @@ public class ProductDTO {
         this.productURL = productURL;
         this.productInven = productInven;
         this.memberEntity = memberEntity;
+        this.category = category;
     }
 
     public ProductDTO(ProductEntity productEntity) {    // 엔티티를 DTO로 변환
@@ -54,6 +54,7 @@ public class ProductDTO {
         this.productURL = productEntity.getProductURL();
         this.productInven = productEntity.getProductInven();
         this.productView = productEntity.getProductView();
+        this.category = productEntity.getCategory();
     }
 
     public static ProductDTO toFileDTO(ProductEntity productEntity){    // DTO 엔티티내용으로 업데이트
@@ -68,6 +69,7 @@ public class ProductDTO {
         fileUploadDTO.setProductInven(productEntity.getProductInven());
         fileUploadDTO.setProductView(productEntity.getProductView());
         fileUploadDTO.setMemberEntity(productEntity.getMemberEntity());
+        fileUploadDTO.setCategory(productEntity.getCategory());
         return fileUploadDTO;
     }
 }

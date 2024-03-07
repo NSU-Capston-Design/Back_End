@@ -89,6 +89,11 @@ public class EventService {
         }
     }
 
+    /**
+     * 날짜 변경하는 메서드
+     * @param eventEnd
+     * @return
+     */
     private static String formatDate(String eventEnd){
         Instant instant = Instant.parse(eventEnd);
         Date date = Date.from(instant);

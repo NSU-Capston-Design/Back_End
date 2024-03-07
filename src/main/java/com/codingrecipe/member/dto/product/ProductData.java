@@ -1,5 +1,6 @@
 package com.codingrecipe.member.dto.product;
 
+import com.codingrecipe.member.entity.Category;
 import com.codingrecipe.member.entity.MemberEntity;
 import lombok.*;
 
@@ -10,11 +11,12 @@ public class ProductData {          // Json데이터를 정의하기 위한 DTO
     private int productPrice;           // 상품가격
     private int productInven;           // 재고수량
     private Long memberId;          // 작성자 id
-
-    public ProductData(String productName, int productPrice, int productInven, int memberId) {
+    private String category;      // 카테고리
+    public ProductData(String productName, int productPrice, int productInven, int memberId, String category) {
         this.productName = productName;
         this.productPrice = productPrice;
         this.productInven = productInven;
         this.memberId = (long)memberId;
+        this.category = category;
     }
 }

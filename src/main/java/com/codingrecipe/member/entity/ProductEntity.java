@@ -41,6 +41,8 @@ public class ProductEntity {
     @Column(columnDefinition = "integer default 0", nullable = false)
     private int productView;   // 상품 조회수
 
+    @Column(name = "category")
+    private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")

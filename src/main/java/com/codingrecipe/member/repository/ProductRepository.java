@@ -17,4 +17,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
     @Query(value = "select p from ProductEntity p join fetch p.memberEntity")
     List<ProductEntity> findByMemberEntityOfProductEntity();
+
+    @Query(value = "select p from ProductEntity p where p.fileId IN :productId")
+    List<ProductEntity> findAllByProductId(long[] productId);
 }
