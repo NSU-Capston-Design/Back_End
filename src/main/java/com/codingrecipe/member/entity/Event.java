@@ -29,16 +29,17 @@ public class Event {
 
     private String eventEnd;            // 이벤트 종료 시간
 
-//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    @JoinColumn(name = "manager_num")
-//    private Manager manager;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "admin_id")
+    private Admin admin;
 
-    public Event(String eventTitle, String eventDetail, String eventImg, String eventData, String eventEnd) {
+    public Event(String eventTitle, String eventDetail, String eventImg, String eventData, String eventEnd, Admin admin) {
         this.eventTitle = eventTitle;
         this.eventDetail = eventDetail;
         this.eventImg = eventImg;
         this.eventData = eventData;
         this.eventEnd = eventEnd;
+        this.admin = admin;
     }
 
 }

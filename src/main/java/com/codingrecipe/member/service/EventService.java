@@ -2,8 +2,10 @@ package com.codingrecipe.member.service;
 
 import com.codingrecipe.member.dto.event.EventList;
 import com.codingrecipe.member.dto.event.EventUpload;
+import com.codingrecipe.member.entity.Admin;
 import com.codingrecipe.member.entity.Event;
 import com.codingrecipe.member.exception.NotFoundEventException;
+import com.codingrecipe.member.repository.AdminRepository;
 import com.codingrecipe.member.repository.EventRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import java.util.*;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final AdminRepository adminRepository;
 
     @Value("${upload.dir}" + "eventPhoto")
     private String uploadDir;
@@ -67,6 +70,10 @@ public class EventService {
             else {
                  eventEnd = formatDate(eventE);       // 날짜 이쁘게 변환
             }
+            Admin byAdminId = adminRepository.findByAdminId(eventUpload.getAdminId());
+            if (byAdminId == null){
+                throw new RuntimeException();
+            }
 
             String uuid = UUID.randomUUID().toString(); // uuid 생성
             MultipartFile file = eventUpload.getFile();
@@ -76,12 +83,12 @@ public class EventService {
             file.transferTo(dest);                          // 실제 경로에 저장
 
             Date currentDate = new Date(); // 현재 시간
-            SimpleDateFormat format = new SimpleDateFormat("yy년/MM월/dd일 - HH:mm"); // 형식 변환
+            SimpleDateFormat format = new SimpleDateFormat("yy/MM/dd - HH:mm"); // 형식 변환
             String date = format.format(currentDate);   // 변환한 날짜 저장
 
             filePath = "/photos/eventPhoto/" + uuid;                     // DB 저장경로로 변경
             System.out.println("date = " + date + "12: " + filePath);
-            Event event = new Event(eventTitle, eventDetail, filePath, date, eventEnd);
+            Event event = new Event(eventTitle, eventDetail, filePath, date, eventEnd, byAdminId);
             eventRepository.save(event);    // 저장
         } catch (Exception e){
             System.out.println("오류 !.. 발...생!! ");

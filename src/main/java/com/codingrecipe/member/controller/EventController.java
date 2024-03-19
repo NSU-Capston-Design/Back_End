@@ -56,7 +56,7 @@ public class EventController {
      */
     @PostMapping("/event/upload")
     public ResponseEntity<String> eventUpload(@RequestPart(name = "event_file") MultipartFile file,
-                                              String title, String detail, String end) throws NotFoundEventException {
+                                              int id, String title, String detail, String end) throws NotFoundEventException {
         try {
             System.out.println("file = " + file);
             System.out.println("title = " + title);
@@ -65,6 +65,7 @@ public class EventController {
             upload.setEventTitle(title);
             upload.setEventDetail(detail);
             upload.setEventEnd(end);
+            upload.setAdminId((long) id);
 
             eventService.eventUpload(upload);
 

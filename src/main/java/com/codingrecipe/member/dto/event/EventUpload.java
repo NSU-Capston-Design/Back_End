@@ -12,4 +12,5 @@ public class EventUpload {
     private String eventTitle;          // 이벤트명
     private String eventDetail;         // 이벤트 상세
     private String eventEnd;            // 이벤트 종료 시간
+    private Long adminId;
 }
