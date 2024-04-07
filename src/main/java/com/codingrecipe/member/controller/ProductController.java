@@ -85,4 +85,17 @@ public class ProductController {
         }
     }
 
+    /**
+     * 상품 삭제
+     */
+    @DeleteMapping("/product/delete/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id){
+        try {
+            String s = productService.deleteProduct(id);
+            return ResponseEntity.ok("ok");
+        } catch (NotFoundProductException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

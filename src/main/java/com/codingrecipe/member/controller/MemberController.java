@@ -4,6 +4,7 @@ import com.codingrecipe.member.dto.member.MemberDTO;
 import com.codingrecipe.member.dto.member.UserIdDTO;
 import com.codingrecipe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
     // 생성자 주입
     private final MemberService memberService;
@@ -22,6 +24,7 @@ public class MemberController {
      */
     @PostMapping("/user/register")
     public ResponseEntity<String> save(@RequestBody MemberDTO memberDTO) {
+
         String save = memberService.save(memberDTO);
 
         return ResponseEntity.ok("회원가입 성공 \n" + "아이디: " + save);
@@ -35,7 +38,6 @@ public class MemberController {
             HttpSession session = request.getSession();  // 세션 생성
             session.setAttribute("userId", loginResult.getUserId());
             System.out.println("session = " + session);
-
             System.out.println("loginResult = " + loginResult.getMemberId());
 
             Long longValue = loginResult.getMemberId();
@@ -43,7 +45,9 @@ public class MemberController {
 
             System.out.println("memberId = " + memberId);
 
-            return ResponseEntity.ok(memberId);
+            return ResponseEntity.ok()
+                    .header("Set-Cookie", "sessionId="+ session.getId())
+                    .body(memberId);
         } else {
             // login 실패
             return ResponseEntity.badRequest().build();
@@ -52,12 +56,17 @@ public class MemberController {
 
     @PostMapping("/user/logout")   // user/logout 세션 삭제
     public ResponseEntity<?> logout(HttpServletRequest request) {   // <?> 제네릭 와일드카드
+        log.info("로그아웃시도");
         HttpSession session = request.getSession(false);
         if(session != null) {
+            log.info("=== 세션 이미 존재 ===");
             session.invalidate();
+            log.info("=== 세션 삭제 완료 ===");
             return ResponseEntity.ok("로그아웃 및 세션삭제");
+        }else {
+            log.info("=== 세션이 없음 ===");
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/users")        // 관리자모드용 회원목록
@@ -98,8 +107,8 @@ public class MemberController {
         }
     }
 
-    @GetMapping("/user/delete/{userId}")  //user/delete/{id} 지금 id는 인덱스값이라 현재 erd 테이블에 없음 추가하는걸로
-    public ResponseEntity<String> deleteById(@PathVariable("userId") String userId) {
+    @DeleteMapping("/user/delete")  //user/delete/{id} 지금 id는 인덱스값이라 현재 erd 테이블에 없음 추가하는걸로
+    public ResponseEntity<String> deleteById(@RequestBody String userId) {
         memberService.deleteById(userId);
         return ResponseEntity.ok("삭제 완료");
     }
@@ -112,6 +121,7 @@ public class MemberController {
             return ResponseEntity.ok(checkResult);
         } return ResponseEntity.badRequest().build();
     }
+
 
 }
 

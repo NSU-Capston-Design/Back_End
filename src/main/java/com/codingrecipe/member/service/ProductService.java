@@ -188,4 +188,17 @@ public class ProductService {
         return allByProductIdDto;
     }
 
+    /**
+     * 상품 삭제
+     */
+    public String deleteProduct(Long id) throws NotFoundProductException {
+        Optional<ProductEntity> byId = productRepository.findById(id);
+        if (byId.isEmpty()){
+            throw new NotFoundProductException("상품을 찾을 수 없습니다.");
+        } else {
+            productRepository.deleteById(id);
+            return "ok";
+        }
+    }
+
 }

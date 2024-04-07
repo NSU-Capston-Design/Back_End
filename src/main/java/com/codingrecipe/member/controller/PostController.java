@@ -73,8 +73,8 @@ public class PostController {
     /**
      * 게시글 삭제
      */
-    @DeleteMapping("/postId")
-    public ResponseEntity<String> postDelete(@PathVariable Integer postId){
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> postDelete(@RequestBody Integer postId){
         long post = postId;
         String s = postService.postDelete(post);
         if (s.equals("ok")){

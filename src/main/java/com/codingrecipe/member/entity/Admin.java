@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class Admin {
 
     /**
