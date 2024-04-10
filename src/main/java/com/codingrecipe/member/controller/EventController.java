@@ -38,11 +38,10 @@ public class EventController {
      * @return 이벤트 단일 출력 (eventId 기반)
      */
     @GetMapping("/event/detail")
-    public ResponseEntity<EventList> eventDetail(@RequestParam(name = "eventId") String eventId){
+    public ResponseEntity<EventList> eventDetail(@RequestParam(name = "eventId") int eventId){
         try {
 
-            long id = Long.parseLong(eventId);    // useParams인한 String을 Long으로 변환
-            EventList event = eventService.findById(id);
+            EventList event = eventService.findById((long) eventId);
             return ResponseEntity.ok(event);
         } catch (EntityNotFoundException e){
             return ResponseEntity.notFound().build();
@@ -73,5 +72,22 @@ public class EventController {
         } catch (NotFoundEventException e){
             throw new NotFoundEventException();
         }
+    }
+
+    /**
+     * 이벤트 삭제
+     */
+    @DeleteMapping("/event/delete")
+    public ResponseEntity<String> deleteEvent(@RequestBody int eventId){
+        try {
+            String s = eventService.deleteEvent(eventId);
+            if (s.equals("ok")){
+                return ResponseEntity.ok("ok");
+            }
+        }catch (NotFoundEventException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        return ResponseEntity.notFound().build();
     }
 }

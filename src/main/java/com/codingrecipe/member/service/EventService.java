@@ -107,4 +107,17 @@ public class EventService {
         SimpleDateFormat format = new SimpleDateFormat("yy년/MM월/dd일 - HH:mm");
         return format.format(date);
     }
+
+    /**
+     * 이벤트 삭제
+     */
+    public String deleteEvent(long eventId) throws NotFoundEventException {
+        Optional<Event> byId = eventRepository.findById(eventId);
+        if (byId.isEmpty()){
+            throw new NotFoundEventException("삭제하려는 이벤트가 존재하지 않습니다.");
+        } else {
+            eventRepository.deleteById(eventId);
+            return "ok";
+        }
+    }
 }
