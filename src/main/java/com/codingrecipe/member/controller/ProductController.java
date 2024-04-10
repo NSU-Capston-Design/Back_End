@@ -44,8 +44,11 @@ public class ProductController {
      */
     @GetMapping("/product/list")
     public ResponseEntity<List<ProductListDTO>> findAll() {
-        List<ProductListDTO> fileDTOList = productService.productList();
 
+        List<ProductListDTO> fileDTOList = productService.productList();
+        if (fileDTOList.isEmpty()){
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(fileDTOList);
     }
 
