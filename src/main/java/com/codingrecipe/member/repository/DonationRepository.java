@@ -10,4 +10,6 @@ public interface DonationRepository extends JpaRepository<DonationEntity, Long> 
     List<DonationEntity> findAllByUserId(String userId);
     List<DonationEntity> findAllByDonationDate(LocalDate donationDate);
     List<DonationEntity> findAllByAmount(int amount);
+
+
 }

@@ -68,6 +68,18 @@ public class DonationService {
         return grade;
     }
 
+    // 기부 여부 확인 메서드
+    public boolean hasDonated(String userId) {
+        // 해당 사용자의 기부 내역을 조회합니다.
+        List<DonationEntity> donations = donationRepository.findAllByUserId(userId);
+        // 기부 내역이 존재하면 true를 반환합니다.
+        return !donations.isEmpty();
+    }
+
+    public List<DonationEntity> getDonationsByUser(String userId) {
+        return donationRepository.findAllByUserId(userId);
+    }
+
     public List<DonationEntity> getDonationsByDate(LocalDate date) {
         return donationRepository.findAllByDonationDate(date);
     }
@@ -75,4 +87,5 @@ public class DonationService {
     public List<DonationEntity> getDonationsByAmount(int amount) {
         return donationRepository.findAllByAmount(amount);
     }
+
 }

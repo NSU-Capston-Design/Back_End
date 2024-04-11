@@ -67,4 +67,29 @@ public class DonationController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(donationDTOs);
     }
+
+    // 아이디별 기부 내역 조회
+    @GetMapping("/donations/by-user")
+    public ResponseEntity<List<DonationDTO>> getDonationsByUser(@RequestParam("userId") String userId) {
+        List<DonationEntity> donationEntities = donationService.getDonationsByUser(userId);
+        List<DonationDTO> donationDTOs = donationEntities.stream()
+                .map(donationEntity -> {
+                    DonationDTO donationDTO = new DonationDTO();
+                    donationDTO.setUserId(donationEntity.getUserId());
+                    donationDTO.setAmount(donationEntity.getAmount());
+                    donationDTO.setDonationDate(donationEntity.getDonationDate());
+                    return donationDTO;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(donationDTOs);
+    }
+
+    // 아이디별 기부 여부 확인
+    @GetMapping("/donations/check")
+    public ResponseEntity<Boolean> checkDonationStatus(@RequestParam("userId") String userId) {
+        boolean hasDonated = donationService.hasDonated(userId);
+        return ResponseEntity.ok(hasDonated);
+    }
+
+
 }
