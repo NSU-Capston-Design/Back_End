@@ -1,6 +1,7 @@
 package com.codingrecipe.member.controller;
 
 import com.codingrecipe.member.dto.member.MemberDTO;
+import com.codingrecipe.member.dto.member.UserDTO;
 import com.codingrecipe.member.dto.member.UserIdDTO;
 import com.codingrecipe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class MemberController {
     }
 
     @PostMapping("/user/login")            //user/login
-    public ResponseEntity<Integer> login(@RequestBody MemberDTO memberDTO, HttpServletRequest request) {
+    public ResponseEntity<UserDTO> login(@RequestBody MemberDTO memberDTO, HttpServletRequest request) {
         MemberDTO loginResult = memberService.login(memberDTO);
         if (loginResult != null) {
             // login 성공시 세션 부여
@@ -42,12 +43,14 @@ public class MemberController {
 
             Long longValue = loginResult.getMemberId();
             int memberId = longValue.intValue();
+            String userId = loginResult.getUserId();
 
+            UserDTO userDTO = new UserDTO(memberId, userId);
             System.out.println("memberId = " + memberId);
 
             return ResponseEntity.ok()
                     .header("Set-Cookie", "sessionId="+ session.getId())
-                    .body(memberId);
+                    .body(userDTO);
         } else {
             // login 실패
             return ResponseEntity.badRequest().build();
