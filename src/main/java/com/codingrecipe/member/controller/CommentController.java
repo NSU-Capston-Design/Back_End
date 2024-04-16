@@ -33,7 +33,7 @@ public class CommentController {
      * 게시글에 달린 댓글 조회
      */
     @GetMapping("/{postId}")
-    public ResponseEntity<List<CommentDTO>> commentAll(@PathVariable Integer postId){
+    public ResponseEntity<List<CommentDTO>> commentAll(@PathVariable int postId){
         List<CommentDTO> commentDTOs = commentService.commentAll(postId);
         if (commentDTOs != null){
             return ResponseEntity.ok(commentDTOs);
