@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @Getter @Setter
 @NoArgsConstructor
@@ -29,17 +31,25 @@ public class OrderEntity {
     @Column
     private String orderPaymentStatus;          // 결제상태
 
-    @Column
-    private int productPrice;                   // 상품가격
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "member_id")
+    private MemberEntity member;
 
-    @Column
-    private String productName;                 // 상품이름
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ProductEntity> products;
+
+//    @Column
+//    private int productPrice;                   // 상품가격
+//
+//    @Column
+//    private String productName;                 // 상품이름
 
     @Column
     private int orderShippingCost;              // 배송비
 
     @Column
     private int orderTotalCost;                 // 총 주문금액
+
 
 
 
