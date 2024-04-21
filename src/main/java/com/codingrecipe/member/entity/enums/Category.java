@@ -1,4 +1,4 @@
-package com.codingrecipe.member.entity;
+package com.codingrecipe.member.entity.enums;
 
 public enum Category {
     TOP,
