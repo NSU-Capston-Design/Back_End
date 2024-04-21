@@ -48,6 +48,7 @@ public class ProductEntity {
     @JoinColumn(name = "member_id")
     private MemberEntity memberEntity;
 
+
     @Transactional
     public void createProduct(ProductDTO productDTO) {  //DTO를 받아 Entity에 저장하는 메서드
 
