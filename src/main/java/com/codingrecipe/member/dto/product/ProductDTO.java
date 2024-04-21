@@ -1,12 +1,9 @@
 package com.codingrecipe.member.dto.product;
 
-import com.codingrecipe.member.dto.member.MemberDTO;
-import com.codingrecipe.member.entity.Category;
+import com.codingrecipe.member.entity.enums.Category;
 import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.entity.ProductEntity;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

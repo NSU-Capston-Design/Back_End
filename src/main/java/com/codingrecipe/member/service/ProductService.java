@@ -1,7 +1,7 @@
 package com.codingrecipe.member.service;
 
 import com.codingrecipe.member.dto.product.*;
-import com.codingrecipe.member.entity.Category;
+import com.codingrecipe.member.entity.enums.Category;
 import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.entity.ProductEntity;
 import com.codingrecipe.member.exception.NotFoundMemberException;

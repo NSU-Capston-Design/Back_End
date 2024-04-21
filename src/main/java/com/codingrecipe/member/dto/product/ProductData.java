@@ -1,7 +1,5 @@
 package com.codingrecipe.member.dto.product;
 
-import com.codingrecipe.member.entity.Category;
-import com.codingrecipe.member.entity.MemberEntity;
 import lombok.*;
 
 @Data
