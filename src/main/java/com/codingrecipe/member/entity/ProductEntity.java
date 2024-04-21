@@ -1,11 +1,12 @@
 package com.codingrecipe.member.entity;
 
 import com.codingrecipe.member.dto.product.ProductDTO;
+import com.codingrecipe.member.entity.enums.Category;
+import com.codingrecipe.member.exception.NotEnoughInvenException;
 import lombok.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
@@ -62,4 +63,23 @@ public class ProductEntity {
 
     }
 
+    //==비즈니스 로직==//
+
+    /**
+     * 재고수량 증가
+     */
+    public void addInven(int count){
+        this.productInven += count;
+    }
+
+    /**
+     * 재고수량 감소
+     */
+    public void removeInven(int count) throws NotEnoughInvenException {
+        int restInven = this.productInven - count;
+        if (restInven < 0){
+            throw new NotEnoughInvenException("need more inven");
+        }
+        this.productInven = restInven;
+    }
 }

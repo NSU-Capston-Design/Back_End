@@ -1,6 +1,6 @@
 package com.codingrecipe.member.dto.product;
 
-import com.codingrecipe.member.entity.Category;
+import com.codingrecipe.member.entity.enums.Category;
 import com.codingrecipe.member.entity.ProductEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
