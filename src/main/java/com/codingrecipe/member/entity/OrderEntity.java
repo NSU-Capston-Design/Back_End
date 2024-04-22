@@ -1,13 +1,11 @@
 package com.codingrecipe.member.entity;
 
-import com.codingrecipe.member.dto.order.OrderDTO;
 import com.codingrecipe.member.entity.enums.DeliveryStatus;
 import com.codingrecipe.member.entity.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -35,19 +33,12 @@ public class OrderEntity {
     @Enumerated(EnumType.STRING)
     private DeliveryStatus delivery;      // 배송 상태 (BEFO, SHIP, COMP)
 
-    @Column
-    private String orderPaymentStatus;          // 결제상태
-
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private MemberEntity member;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
     private List<OrderItem> orderItems = new ArrayList<>();
-
-    @Column
-    private int orderTotalCost;                 // 총 주문금액
-
 
     //==연관관계 메서드==//
     public void setMember(MemberEntity member){
@@ -61,7 +52,6 @@ public class OrderEntity {
     }
 
     //==생성 메서드==//
-
     /**
      * 주문 생성
      */
@@ -72,6 +62,7 @@ public class OrderEntity {
             orderEntity.addOrderItem(orderItem);
         }
         orderEntity.setOrderStatus(OrderStatus.ORDER);
+        orderEntity.setDelivery(DeliveryStatus.BEFO);
         orderEntity.setOrderDate(LocalDateTime.now());
         return orderEntity;
     }

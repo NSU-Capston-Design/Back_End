@@ -8,6 +8,10 @@ public class NotFoundProductException extends Exception{
         super(message);
     }
 
+    public NotFoundProductException(String message, Long id){
+        super(message);
+        System.out.println("id = " + id);
+    }
     public NotFoundProductException(String message, Throwable cause) {
         super(message, cause);
     }
