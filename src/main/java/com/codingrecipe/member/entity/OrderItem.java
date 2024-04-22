@@ -1,13 +1,17 @@
 package com.codingrecipe.member.entity;
 
 import com.codingrecipe.member.exception.NotEnoughInvenException;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Getter @Setter
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "OrderItem")
 public class OrderItem {
 

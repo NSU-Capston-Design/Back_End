@@ -10,10 +10,12 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
-    // 추가적인 쿼리 메소드가 필요한 경우 작성할 수 있습니다.
 
     @Query(value = "SELECT p FROM ProductEntity p ORDER BY p.productView DESC")
     List<ProductEntity> findTop3ByProductView();
+
+    @Query(value = "SELECT p FROM ProductEntity p where p.fileId = :fileId")
+    ProductEntity findByFileId(Long fileId);
 
     @Query(value = "select p from ProductEntity p join fetch p.memberEntity")
     List<ProductEntity> findByMemberEntityOfProductEntity();
