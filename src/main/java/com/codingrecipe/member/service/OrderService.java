@@ -1,85 +1,104 @@
 package com.codingrecipe.member.service;
 
 import com.codingrecipe.member.dto.order.OrderDTO;
+import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.entity.OrderEntity;
+import com.codingrecipe.member.entity.OrderItem;
+import com.codingrecipe.member.entity.ProductEntity;
+import com.codingrecipe.member.exception.NotEnoughInvenException;
+import com.codingrecipe.member.exception.NotFoundMemberException;
+import com.codingrecipe.member.exception.NotFoundProductException;
+import com.codingrecipe.member.repository.MemberRepository;
 import com.codingrecipe.member.repository.OrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.codingrecipe.member.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    public OrderService(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
+    /**
+     * 주문 생성
+     */
+    public void createOrder(int[] orderPrices, int[] counts, Long memberId, long[] productId) throws NotFoundProductException, NotEnoughInvenException, NotFoundMemberException {
+
+        log.info("===주문 생성===");
+        List<ProductEntity> products = new ArrayList<>();       // 받은 상품들을 넣을 가변 배열 List 생성
+
+        log.info("===productId로 상품조회===");
+        for (Long product : productId){                         // for each문을 통하여 순회
+            ProductEntity byFileId = productRepository.findByFileId(product);           // 각 상품 조회
+            if (byFileId == null){                              // null이라면, 예외처리
+                log.info("===상품 조회 실패===");
+                throw new NotFoundProductException("상품을 찾을 수 없습니다.", product);
+            }
+
+            products.add(byFileId);                             // 리스트에 담기
+        }
+
+        log.info("===유저 조회===");
+        Optional<MemberEntity> byMemberId = memberRepository.findById(memberId);    // memberId를 통해 유저 찾기
+        if (byMemberId.isEmpty()){                                                  // 만약 없는 id라면 예외처리
+            log.info("===유저 조회 실패=== memberId :" + memberId);
+            throw new NotFoundMemberException("사용자를 찾을 수 없습니다.");
+        }
+
+        List<OrderItem> orderItems = new ArrayList<>();                             // orderItem을 생성 후 담을 List 생성
+        log.info("===orderItems 생성===");
+        for (int i = 0; i <products.size(); i++){                                   // 순회하면서 담기
+            ProductEntity product = products.get(i);
+            int orderPrice = orderPrices[i];
+            int count = counts[i];
+            orderItems.add(OrderItem.createOrderItem(product, orderPrice, count));
+        }
+
+        log.info("===List인 orderItems 배열[]로 변환===");
+        OrderItem[] ArrayOrderItems = orderItems.toArray(new OrderItem[0]);
+
+        log.info("===order생성===");
+        OrderEntity order = OrderEntity.createOrder(byMemberId.get(), ArrayOrderItems);
+
+        orderRepository.save(order);
     }
 
-    public OrderEntity createOrder(OrderDTO orderDTO) { // 주문생성
-        OrderEntity orderEntity = new OrderEntity();
-        orderEntity.setOrderDate(orderDTO.getOrderDate());
-        orderEntity.setOrderStatus(orderDTO.getOrderStatus());
-        orderEntity.setOrderPaymentStatus(orderDTO.getOrderPaymentStatus());
-        orderEntity.setProductPrice(orderDTO.getProductPrice());
-        orderEntity.setProductName(orderDTO.getProductName());
-        orderEntity.setOrderShippingCost(orderDTO.getOrderShippingCost());
-        // 주문 총 비용 = 상품 가격 + 주문 배송 비용
-        int orderTotalCost = orderDTO.getProductPrice() + orderDTO.getOrderShippingCost();
-        orderEntity.setOrderTotalCost(orderTotalCost);
-        // 다른 속성 설정이 필요한 경우 여기에 추가
-        return orderRepository.save(orderEntity);
-    }
+    /**
+     * 주문 조회
+     */
+    public List<OrderDTO> orders(String userId) throws NotFoundMemberException {
+        Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);
+        if (byUserId.isEmpty()){
+            throw new NotFoundMemberException("사용자를 찾을 수 없습니다. userId: " + userId);
+        }
+        List<OrderEntity> orders = orderRepository.findByMember(byUserId.get());
 
-    public OrderDTO getOrderById(Long orderId) {
+        List<OrderDTO> orderDTOList = new ArrayList<>();
 
-        OrderEntity orderEntity = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
-        return new OrderDTO(orderEntity);
-    }
+        for (int i = 0; i < orders.size(); i++){
+            OrderEntity orderEntity = orders.get(i);
+            OrderDTO build = new OrderDTO.Builder()
+                    .orderId(orderEntity.getOrderId())
+                    .orderDate(orderEntity.getOrderDate())
+                    .orderStatus(orderEntity.getOrderStatus())
+                    .delivery(orderEntity.getDelivery())
+                    .orderItems(orderEntity.getOrderItems())
+                    .orderTotalCost(orderEntity.getTotalPrice())
+                    .build();
 
-    public List<OrderDTO> getAllOrders() {
-        List<OrderEntity> orderEntities = orderRepository.findAll();
-        return orderEntities.stream()
-                .map(OrderDTO::new)
-                .collect(Collectors.toList());
-    }
+            orderDTOList.add(build);
+        }
 
-    public OrderEntity updateOrder(Long orderId, OrderDTO orderDTO) {
-        // 주문 엔티티를 주문 ID로 조회합니다.
-        OrderEntity orderEntity = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("주문 ID " + orderId + "에 해당하는 주문을 찾을 수 없습니다."));
+        return orderDTOList;
 
-        // 주문 엔티티의 속성을 주문 DTO를 사용하여 업데이트합니다.
-        // 여기서는 주문 DTO에 선택된 상품 및 가격 정보가 포함되어 있다고 가정합니다.
-
-        // 주문 상태 및 결제 상태를 업데이트합니다.
-        orderEntity.setOrderStatus(orderDTO.getOrderStatus());
-        orderEntity.setOrderPaymentStatus(orderDTO.getOrderPaymentStatus());
-
-        // 상품 가격을 업데이트합니다.
-        orderEntity.setProductPrice(orderDTO.getProductPrice());
-
-        // 상품 이름을 업데이트합니다.
-        orderEntity.setProductName(orderDTO.getProductName());
-
-        // 주문 배송 비용을 업데이트합니다.
-        orderEntity.setOrderShippingCost(orderDTO.getOrderShippingCost());
-
-        // 주문 총 비용을 업데이트합니다.
-        orderEntity.setOrderTotalCost(orderDTO.getOrderTotalCost());
-
-//        // 수량을 업데이트합니다.
-//        orderEntity.setQuantity(orderDTO.getQuantity());
-
-        // 업데이트된 주문 엔티티를 저장합니다.
-        return orderRepository.save(orderEntity);
-    }
-
-    public void deleteOrder(Long orderId) {
-        orderRepository.deleteById(orderId);
     }
 }
