@@ -1,11 +1,17 @@
 package com.codingrecipe.member.controller;
 
 import com.codingrecipe.member.dto.order.OrderDTO;
+import com.codingrecipe.member.dto.order.OrderRequestDTO;
 import com.codingrecipe.member.entity.OrderEntity;
+import com.codingrecipe.member.exception.NotEnoughInvenException;
+import com.codingrecipe.member.exception.NotFoundMemberException;
+import com.codingrecipe.member.exception.NotFoundProductException;
 import com.codingrecipe.member.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -18,23 +24,39 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping(value = "/orders")
-    public OrderEntity createOrder(@RequestBody OrderDTO orderDTO) {
-        return orderService.createOrder(orderDTO);
+    /**
+     * 주문하기
+     */
+    @PostMapping(value = "/order")
+    public ResponseEntity<String> createOrder(@RequestBody OrderRequestDTO orderDTO){
+        try {
+            orderService.createOrder(orderDTO.getPrice(), orderDTO.getCount(), orderDTO.getMemberId(), orderDTO.getProductId());
+        } catch (NotEnoughInvenException | NotFoundProductException | NotFoundMemberException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok("ok");
     }
 
-    @GetMapping("/get/{orderId}")
-    public OrderDTO getOrderById(@PathVariable Long orderId) {
-        return orderService.getOrderById(orderId);
+    /**
+     * 주문 내역 조회
+     */
+    @GetMapping("/orders")
+    public ResponseEntity<?> getOrderById(@RequestParam("userId") String userId){
+        try {
+            List<OrderDTO> orders = orderService.orders(userId);
+            return ResponseEntity.ok(orders);
+        } catch (NotFoundMemberException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/getAll")
-    public List<OrderDTO> getAllOrders() {
+    public List<OrderRequestDTO> getAllOrders() {
         return orderService.getAllOrders();
     }
 
     @PutMapping("/update/{orderId}")
-    public OrderEntity updateOrder(@PathVariable Long orderId, @RequestBody OrderDTO orderDTO) {
+    public OrderEntity updateOrder(@PathVariable Long orderId, @RequestBody OrderRequestDTO orderDTO) {
         return orderService.updateOrder(orderId, orderDTO);
     }
 
