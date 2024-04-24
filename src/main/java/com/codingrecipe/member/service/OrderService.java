@@ -1,12 +1,15 @@
 package com.codingrecipe.member.service;
 
 import com.codingrecipe.member.dto.order.OrderDTO;
+import com.codingrecipe.member.dto.order.OrderItmesDTO;
+import com.codingrecipe.member.dto.order.OrderRequestDTO;
 import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.entity.OrderEntity;
 import com.codingrecipe.member.entity.OrderItem;
 import com.codingrecipe.member.entity.ProductEntity;
 import com.codingrecipe.member.exception.NotEnoughInvenException;
 import com.codingrecipe.member.exception.NotFoundMemberException;
+import com.codingrecipe.member.exception.NotFoundOrderException;
 import com.codingrecipe.member.exception.NotFoundProductException;
 import com.codingrecipe.member.repository.MemberRepository;
 import com.codingrecipe.member.repository.OrderRepository;
@@ -31,44 +34,49 @@ public class OrderService {
     /**
      * 주문 생성
      */
-    public void createOrder(int[] orderPrices, int[] counts, Long memberId, long[] productId) throws NotFoundProductException, NotEnoughInvenException, NotFoundMemberException {
+    public void createOrder(OrderItmesDTO orderItmesDTO) throws NotFoundProductException, NotEnoughInvenException, NotFoundMemberException {
 
         log.info("===주문 생성===");
+
         List<ProductEntity> products = new ArrayList<>();       // 받은 상품들을 넣을 가변 배열 List 생성
 
-        log.info("===productId로 상품조회===");
-        for (Long product : productId){                         // for each문을 통하여 순회
-            ProductEntity byFileId = productRepository.findByFileId(product);           // 각 상품 조회
-            if (byFileId == null){                              // null이라면, 예외처리
-                log.info("===상품 조회 실패===");
-                throw new NotFoundProductException("상품을 찾을 수 없습니다.", product);
-            }
+        String userId = orderItmesDTO.getUserId();              // 주문한 유저정보 가져오기
+        List<OrderRequestDTO> orderDTOS = orderItmesDTO.getOrderRequestDTOS(); // 주문받은 리스트 빼서 저장
 
-            products.add(byFileId);                             // 리스트에 담기
+        for (int i = 0; i < orderDTOS.size(); i++){                 // for문으로 주문받은 products들 조회
+            OrderRequestDTO orderRequestDTO = orderDTOS.get(i);
+            log.info("===productId로 상품조회=== fileId : " + orderRequestDTO.getProductId());
+            Optional<ProductEntity> byFileId = productRepository.findByFileId(orderRequestDTO.getProductId());
+            if (byFileId.isEmpty()){        // byfileId가 존재 안할시에 예외처리
+                log.info("===상품이 존재하지 않음=== fileId : " + orderRequestDTO.getProductId());
+                throw new NotFoundProductException("상품을 찾을 수 없습니다.", byFileId.get().getFileId());
+            }
+            products.add(byFileId.get());           // List product에 추가
         }
 
         log.info("===유저 조회===");
-        Optional<MemberEntity> byMemberId = memberRepository.findById(memberId);    // memberId를 통해 유저 찾기
-        if (byMemberId.isEmpty()){                                                  // 만약 없는 id라면 예외처리
-            log.info("===유저 조회 실패=== memberId :" + memberId);
+        Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);// userId를 통해 유저 찾기
+        if (byUserId.isEmpty()){                                                  // 만약 없는 id라면 예외처리
+            log.info("===유저 조회 실패=== userId :" + byUserId.get());
             throw new NotFoundMemberException("사용자를 찾을 수 없습니다.");
         }
 
         List<OrderItem> orderItems = new ArrayList<>();                             // orderItem을 생성 후 담을 List 생성
-        log.info("===orderItems 생성===");
-        for (int i = 0; i <products.size(); i++){                                   // 순회하면서 담기
-            ProductEntity product = products.get(i);
-            int orderPrice = orderPrices[i];
-            int count = counts[i];
-            orderItems.add(OrderItem.createOrderItem(product, orderPrice, count));
+        log.info("===List<orderItems>에 orderItem 생성 후 넣기===");
+        for (int i = 0; i < products.size(); i++){
+            log.info("===orderItem 생성=== orderItem : " + orderItems.get(i));
+            OrderItem orderItem = OrderItem.createOrderItem(products.get(i), orderDTOS.get(i).getPrice(), orderDTOS.get(i).getCount());
+
+            orderItems.add(orderItem);
         }
 
-        log.info("===List인 orderItems 배열[]로 변환===");
-        OrderItem[] ArrayOrderItems = orderItems.toArray(new OrderItem[0]);
+        log.info("===List<OrderItem> 배열로 변환===");
+        OrderItem[] array = orderItems.toArray(new OrderItem[0]);
 
-        log.info("===order생성===");
-        OrderEntity order = OrderEntity.createOrder(byMemberId.get(), ArrayOrderItems);
+        log.info("===OrderEntity 생성===");
+        OrderEntity order = OrderEntity.createOrder(byUserId.get(), array);
 
+        log.info("===OrderEntity 저장===");
         orderRepository.save(order);
     }
 
@@ -99,6 +107,50 @@ public class OrderService {
         }
 
         return orderDTOList;
+    }
 
+    /**
+     * 주문 상세 조회
+     */
+    public OrderDTO getOrder(long orderId){
+        log.info("===주문 상세 조회=== orderId : " + orderId);
+        Optional<OrderEntity> byId = orderRepository.findById(orderId);
+        if (byId.isEmpty()){
+            log.info("===주문 조회 실패=== orderId : " + orderId);
+            throw new NotFoundOrderException("주문 정보를 조회할 수 없습니다. orderId : " + orderId);
+        }
+        OrderEntity orderEntity = byId.get();
+        log.info("===[Builder]OrderEntity를 OrderDTO로 변환===");
+
+        return  new OrderDTO.Builder()
+                .orderId(orderEntity.getOrderId())
+                .orderDate(orderEntity.getOrderDate())
+                .orderStatus(orderEntity.getOrderStatus())
+                .delivery(orderEntity.getDelivery())
+                .orderItems(orderEntity.getOrderItems())
+                .orderTotalCost(orderEntity.getTotalPrice())
+                .build();
+    }
+
+    /**
+     * 주문 취소
+     */
+    public void deleteOrder(long orderId){
+        try {
+            log.info("===주문 취소=== orderId : " + orderId);
+            Optional<OrderEntity> byId = orderRepository.findById(orderId);
+            if (byId.isEmpty()){
+                log.info("===주문 조회 실패=== orderId : " + orderId);
+                throw new NotFoundOrderException("주문 정보를 조회할 수 없습니다. orderId : " + orderId);
+            }
+            log.info("===주문 취소 상품재고 복구===");
+            byId.get().cancel();
+            
+            log.info("===주문 삭제===");
+            orderRepository.deleteById(orderId);
+            log.info("===주문 삭제 성공===");
+        } catch (NotFoundOrderException | IllegalStateException e){
+            System.out.println(e.getMessage());
+        }
     }
 }
