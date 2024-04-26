@@ -12,8 +12,8 @@ public class DonationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private String userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private MemberEntity member;
 
     @Column(name = "amount")
     private int amount;
