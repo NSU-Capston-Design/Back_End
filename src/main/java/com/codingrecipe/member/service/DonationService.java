@@ -2,25 +2,45 @@ package com.codingrecipe.member.service;
 
 import com.codingrecipe.member.dto.Donation.DonationDTO;
 import com.codingrecipe.member.entity.DonationEntity;
+import com.codingrecipe.member.entity.MemberEntity;
+import com.codingrecipe.member.exception.NotFoundMemberException;
 import com.codingrecipe.member.repository.DonationRepository;
+import com.codingrecipe.member.repository.MemberRepository;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
+@Slf4j
 public class DonationService {
 
-    @Autowired
     private DonationRepository donationRepository;
+    private MemberRepository memberRepository;
 
+    /**
+     * 기부하기
+     */
     @Transactional
-    public String donate(DonationDTO donationDTO) {
+    public String donate(DonationDTO donationDTO) throws NotFoundMemberException {
+
+        log.info("===기부하기===");
+
+        log.info("===userId로 회원 조회=== userId : " + donationDTO.getUserId());
+        Optional<MemberEntity> byUserId = memberRepository.findByUserId(donationDTO.getUserId());
+        if (byUserId.isEmpty()){
+            log.info("===회원 조회 실패=== userId : " + donationDTO.getUserId());
+            throw new NotFoundMemberException("없는 회원입니다.");
+        }
         DonationEntity donationEntity = new DonationEntity();
-        donationEntity.setUserId(donationDTO.getUserId());
+        donationEntity.setMember(byUserId.get());
         donationEntity.setAmount(donationDTO.getAmount());
         donationEntity.setDonationDate(LocalDate.now());
 
@@ -29,10 +49,17 @@ public class DonationService {
         return "기부가 완료되었습니다.";
     }
 
-    public int getTotalDonationAmount(String userId) {
-        List<DonationEntity> donations = donationRepository.findAllByUserId(userId);
+    /**
+     * 기부 총액 조회
+     */
+    public int getTotalDonationAmount(String userId) throws NotFoundMemberException {
+        Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);
+        if (byUserId.isEmpty()){
+            throw new NotFoundMemberException("없는 회원입니다.");
+        }
+        List<DonationEntity> allByMember = donationRepository.findAllByMember(byUserId.get());
         int totalAmount = 0;
-        for (DonationEntity donation : donations) {
+        for (DonationEntity donation : allByMember) {
             totalAmount += donation.getAmount();
         }
         return totalAmount;
@@ -42,7 +69,7 @@ public class DonationService {
         List<DonationEntity> donations = donationRepository.findAll();
 
         List<String> topDonators = donations.stream()
-                .collect(Collectors.groupingBy(DonationEntity::getUserId, Collectors.summingInt(DonationEntity::getAmount)))
+                .collect(Collectors.groupingBy(DonationEntity::getMember, Collectors.summingInt(DonationEntity::getAmount)))
                 .entrySet().stream()
                 .sorted((entry1, entry2) -> Integer.compare(entry2.getValue(), entry1.getValue()))
                 .limit(limit)
@@ -69,15 +96,27 @@ public class DonationService {
     }
 
     // 기부 여부 확인 메서드
-    public boolean hasDonated(String userId) {
+    public boolean hasDonated(String userId) throws NotFoundMemberException {
+        Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);
+        if (byUserId.isEmpty()){
+            throw new NotFoundMemberException("사용자를 찾을 수 없습니다. userId : " + userId);
+        }
         // 해당 사용자의 기부 내역을 조회합니다.
-        List<DonationEntity> donations = donationRepository.findAllByUserId(userId);
-        // 기부 내역이 존재하면 true를 반환합니다.
+        List<DonationEntity> donations = donationRepository.findAllByUserId(byUserId.get());
         return !donations.isEmpty();
+        // 기부 내역이 존재하면 true를 반환합니다.
     }
 
-    public List<DonationEntity> getDonationsByUser(String userId) {
-        return donationRepository.findAllByUserId(userId);
+    /**
+     * 유저 기부내역 확인
+     */
+    public List<DonationEntity> getDonationsByUser(String userId) throws NotFoundMemberException {
+        Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);
+        if (byUserId.isEmpty()){
+            throw new NotFoundMemberException("사용자를 찾을 수 없습니다. userId : " + userId);
+        }
+
+        return donationRepository.findAllByUserId(byUserId.get());
     }
 
     public List<DonationEntity> getDonationsByDate(LocalDate date) {
