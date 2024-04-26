@@ -141,8 +141,13 @@ public class ProductService {
      * 조회수 순으로 상품 3개를 가져옴(메인화면에 쓰이는 용도)
      */
     public List<ProductDTO> findTopView() throws NotFoundProductException {
-        List<ProductEntity> top3Product = productRepository.findTop3ByProductView();
+        Optional<List<ProductEntity>> top3ProductOptional = productRepository.findTop3ByProductView();
         List<ProductDTO> top3ProductDto = new ArrayList<>();
+
+        if (top3ProductOptional.isEmpty()){
+            throw new NotFoundProductException("상품이 없습니다.");
+        }
+        List<ProductEntity> top3Product = top3ProductOptional.get();
 
         if (top3Product.size() < 3){
             for (int i = 0; i < top3Product.size(); i++){
