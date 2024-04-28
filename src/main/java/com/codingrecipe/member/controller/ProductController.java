@@ -1,6 +1,7 @@
 package com.codingrecipe.member.controller;
 
 import com.codingrecipe.member.dto.product.*;
+import com.codingrecipe.member.exception.NotFoundFileException;
 import com.codingrecipe.member.exception.NotFoundProductException;
 import com.codingrecipe.member.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +97,7 @@ public class ProductController {
         try {
             String s = productService.deleteProduct(id);
             return ResponseEntity.ok("ok");
-        } catch (NotFoundProductException e){
+        } catch (NotFoundProductException | NotFoundFileException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

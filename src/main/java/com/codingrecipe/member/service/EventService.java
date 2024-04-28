@@ -27,7 +27,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final AdminRepository adminRepository;
 
-    @Value("${upload.dir}" + "eventPhoto")
+    @Value("${upload.dir}" + "/eventPhoto")
     private String uploadDir;
 
 
