@@ -37,7 +37,7 @@ public class OrderEntity {
     @JoinColumn(name = "member_id")
     private MemberEntity member;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "order")
     private List<OrderItem> orderItems = new ArrayList<>();
 
     //==연관관계 메서드==//
