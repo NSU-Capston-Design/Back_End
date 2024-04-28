@@ -20,14 +20,14 @@ spring:
   # spring data jpa 설정
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     open-in-view: false
     show-sql: true
     format_sql: true
 
 upload:
-  dir: "C:/Users/dlaco/Desktop/Back_End/src/main/resources/static/photos"
+  dir: "C:/Users/dlaco/Desktop/Capstone_Project/Back_End/src/main/resources/static/photos"
 
 
 logging:
