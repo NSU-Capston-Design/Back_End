@@ -9,6 +9,7 @@ import com.codingrecipe.member.exception.NotFoundMemberException;
 import com.codingrecipe.member.exception.NotFoundProductException;
 import com.codingrecipe.member.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -37,23 +39,37 @@ public class ProductService {
     public void uploadFile(ProductRequest productRequest) {          // 파일을 매개변수로 받음
         try {
             MultipartFile file = productRequest.getFile();
+            log.info("===MultipartFile file에 담기 성공===");
+
             String produtName = productRequest.getData().getProductName();
             int price = productRequest.getData().getProductPrice();
             int productInven = productRequest.getData().getProductInven();
+
             MemberEntity byMemberId = memberService.findByMemberId(productRequest.getData().getMemberId()).get();
-            Category category = getCategory(productRequest);    // 카테고리 뽑기
+            log.info("===member 찾기 성공=== memberId : " + byMemberId.getUserId());
+
+            Category category = Category.TOP;    // 카테고리 뽑기
+            log.info("===Category 주입 성공=== : " + category);
 
             Date currentDate = new Date(); // 현재 시간
             SimpleDateFormat format = new SimpleDateFormat("yy/MM/dd - HH:mm"); // 형식 변환
             String date = format.format(currentDate);   // 변환한 날짜 저장
 
+            log.info("===날짜의 형식 변환 및 저장 성공=== : " + date);
+
             String originProductName = produtName;
 
             UUID uuid = UUID.randomUUID();
-            String extention = originProductName.substring(originProductName.indexOf("."));
-            String saveFileName = uuid.toString() + extention;
-            String fileUpload = uploadDir + File.separator + saveFileName;
+            log.info("===uuid 생성 성공=== : " + uuid);
 
+            String extension = file.getContentType();
+            log.info("===extention(확장자) 저장 성공=== : " + extension);
+
+            String saveFileName = uuid + "." + extension.substring(extension.length() - 3);;
+            log.info("===saveFileName 생성 성공=== : " + saveFileName);
+
+            String fileUpload = uploadDir + "/" + saveFileName;  // upload 절대 주소
+            log.info("===fileUpload 생성 성공=== : " + fileUpload);
 //            String replaceProductName = originProductName.replaceAll("\\s", "_");   // 공백을 언더바로 치환
 //            String filePath = uploadDir + File.separator + replaceProductName;   // 파일 경로 설정 (uploadDir에는 static 포토주소 있음)
 
@@ -78,35 +94,35 @@ public class ProductService {
 
             System.out.println("uploadedFile = " + uploadedFile);
         } catch (IOException e) {
-            System.out.println("e = " + e);
+            System.out.println("e = " + e.getMessage());
         } catch (NotFoundMemberException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
     }
 
     /**
      * 카테고리 메서드
      */
-    private static Category getCategory(ProductRequest productRequest) {
-        String categories = productRequest.getData().getCategory();
-        Category category = Category.DEFAULT;
-        if (categories.equals("TOP")){
-            category = Category.TOP;
-        } else if (categories.equals("PANTS")) {
-            category = Category.PANTS;
-        } else if(categories.equals("SHOES")){
-            category = Category.SHOES;
-        } else if(categories.equals("BAG")){
-            category = Category.BAG;
-        } else if(categories.equals("ELECTRONICS")){
-            category = Category.ELECTRONICS;
-        } else {
-            if (categories.isEmpty()){
-                throw new NullPointerException("입력된 값이 없습니다.");
-            }
-        }
-        return category;
-    }
+//    private static Category getCategory(ProductRequest productRequest) {
+//        String categories = productRequest.getData().getCategory();
+//        Category category = Category.DEFAULT;
+//        if (categories.equals("TOP")){
+//            category = Category.TOP;
+//        } else if (categories.equals("PANTS")) {
+//            category = Category.PANTS;
+//        } else if(categories.equals("SHOES")){
+//            category = Category.SHOES;
+//        } else if(categories.equals("BAG")){
+//            category = Category.BAG;
+//        } else if(categories.equals("ELECTRONICS")){
+//            category = Category.ELECTRONICS;
+//        } else {
+//            if (categories.isEmpty()){
+//                throw new NullPointerException("입력된 값이 없습니다.");
+//            }
+//        }
+//        return category;
+//    }
 
     /**
      * @return 상품 리스트
