@@ -5,6 +5,7 @@ import com.codingrecipe.member.exception.NotFoundFileException;
 import com.codingrecipe.member.exception.NotFoundProductException;
 import com.codingrecipe.member.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class ProductController {
 
     private final ProductService productService;
@@ -29,12 +31,15 @@ public class ProductController {
         try {
             ProductRequest productRequest = new ProductRequest();
             productRequest.setFile(file);
+            log.info("===DTO file set 성공=== : " + file);
             productRequest.setData(data);
+            log.info("===DTO data set 성공=== : " + data);
             productService.uploadFile(productRequest);
+            log.info("===uploadFile 성공=== : " + productRequest);
 
             return ResponseEntity.ok("등록 성공! \n" + data.getMemberId());
         } catch (Exception e){
-
+            System.out.println(e.getMessage());
             return ResponseEntity.status(500).body("상품 등록 실패...");
         }
 
