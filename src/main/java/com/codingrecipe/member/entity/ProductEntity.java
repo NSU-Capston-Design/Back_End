@@ -43,6 +43,7 @@ public class ProductEntity {
     private int productView;   // 상품 조회수
 
     @Column(name = "category")
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
