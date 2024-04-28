@@ -1,5 +1,6 @@
 package com.codingrecipe.member.dto.product;
 
+import com.codingrecipe.member.entity.enums.Category;
 import lombok.*;
 
 @Data
@@ -15,6 +16,6 @@ public class ProductData {          // Json데이터를 정의하기 위한 DTO
         this.productPrice = productPrice;
         this.productInven = productInven;
         this.memberId = (long)memberId;
-        this.category = category;
+        this.category = "P";
     }
 }
