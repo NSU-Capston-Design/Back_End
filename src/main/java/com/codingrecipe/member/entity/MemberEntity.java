@@ -35,14 +35,14 @@ public class MemberEntity {
     @Column // 새로운 필드
     private String userBirth;
 
-    @OneToMany(mappedBy = "memberEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "memberEntity", cascade = CascadeType.REMOVE)
     private List<ProductEntity> productEntityList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
-    private List<OrderEntity> orders;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<OrderEntity> orders = new ArrayList<>();
 
     public static MemberEntity toMemberEntity(MemberDTO memberDTO) {
         MemberEntity memberEntity = new MemberEntity();

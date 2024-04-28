@@ -4,6 +4,7 @@ import com.codingrecipe.member.dto.product.*;
 import com.codingrecipe.member.entity.enums.Category;
 import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.entity.ProductEntity;
+import com.codingrecipe.member.exception.NotFoundFileException;
 import com.codingrecipe.member.exception.NotFoundMemberException;
 import com.codingrecipe.member.exception.NotFoundProductException;
 import com.codingrecipe.member.repository.ProductRepository;
@@ -17,10 +18,7 @@ import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -30,7 +28,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final MemberService memberService;
 
-    @Value("${upload.dir}" + "postPhoto")
+    @Value("${upload.dir}" + "/postPhoto")
     private String uploadDir;
 
     /**
@@ -50,13 +48,19 @@ public class ProductService {
             String date = format.format(currentDate);   // 변환한 날짜 저장
 
             String originProductName = produtName;
-            String replaceProductName = originProductName.replaceAll("\\s", "_");   // 공백을 언더바로 치환
 
-            String filePath = uploadDir + File.separator + replaceProductName;   // 파일 경로 설정 (uploadDir에는 static 포토주소 있음)
-            File dest = new File(filePath);         // 파일 객체 dest를 생성 하고, 파일 경로를 넣음
+            UUID uuid = UUID.randomUUID();
+            String extention = originProductName.substring(originProductName.indexOf("."));
+            String saveFileName = uuid.toString() + extention;
+            String fileUpload = uploadDir + File.separator + saveFileName;
+
+//            String replaceProductName = originProductName.replaceAll("\\s", "_");   // 공백을 언더바로 치환
+//            String filePath = uploadDir + File.separator + replaceProductName;   // 파일 경로 설정 (uploadDir에는 static 포토주소 있음)
+
+            File dest = new File(fileUpload);         // 파일 객체 dest를 생성 하고, 파일 경로를 넣음
             file.transferTo(dest);    // transferTo 메서드는 MultipartFile에서 실제 파일로의 이동 또는 복사를 수행하는 메서드. (절대경로에 저장)
 
-            filePath = "/photos/postPhoto/" + replaceProductName;   // 상대경로로 변경
+            String filePath = "/photos/postPhoto/" + saveFileName;   // 상대경로로 변경
 
 
 
@@ -196,13 +200,22 @@ public class ProductService {
     /**
      * 상품 삭제
      */
-    public String deleteProduct(Long id) throws NotFoundProductException {
+    public String deleteProduct(Long id) throws NotFoundProductException, NotFoundFileException {
         Optional<ProductEntity> byId = productRepository.findById(id);
         if (byId.isEmpty()){
             throw new NotFoundProductException("상품을 찾을 수 없습니다.");
         } else {
-            productRepository.deleteById(id);
-            return "ok";
+            String productURL = byId.get().getProductURL();
+            String filePath = uploadDir + productURL;
+            File deleteFile = new File(filePath);
+            if (deleteFile.exists()){
+                deleteFile.delete();
+                productRepository.deleteById(id);
+                return "ok";
+            } else {
+                productRepository.deleteById(id);
+                throw new NotFoundFileException("파일을 찾을 수 없습니다.");
+            }
         }
     }
 
