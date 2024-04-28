@@ -17,18 +17,17 @@ spring:
   thymeleaf:
     cache: false
 
-upload:
-  dir: "C:/Users/dlaco/Desktop/Back_End/src/main/resources/static/photos/postPhoto"
-
   # spring data jpa 설정
   jpa:
+    hibernate:
+      ddl-auto: create-drop
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     open-in-view: false
     show-sql: true
     format_sql: true
-    hibernate:
-      hbm2ddl.auto: create-auto
-    properties:
+
+upload:
+  dir: "C:/Users/dlaco/Desktop/Back_End/src/main/resources/static/photos"
 
 
 logging:

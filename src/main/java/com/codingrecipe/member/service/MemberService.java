@@ -1,5 +1,6 @@
 package com.codingrecipe.member.service;
 
+import com.codingrecipe.member.dto.member.LoginDTO;
 import com.codingrecipe.member.dto.member.MemberDTO;
 import com.codingrecipe.member.entity.MemberEntity;
 import com.codingrecipe.member.exception.NotFoundMemberException;
@@ -15,6 +16,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+
+    /**
+     * 회원가입
+     * @return Stirng userId
+     */
     public String save(MemberDTO memberDTO) {
         // 1. dto -> entity 변환
         // 2. repository의 save 메서드 호출
@@ -22,10 +28,13 @@ public class MemberService {
         MemberEntity save = memberRepository.save(memberEntity);
 
         return save.getUserId();
-
     }
 
-    public MemberDTO login(MemberDTO memberDTO) {
+    /**
+     * 로그인
+     * @return MemberDTO
+     */
+    public MemberDTO login(LoginDTO memberDTO) {
         /*
             1. 회원이 입력한 이메일로 DB에서 조회를 함
             2. DB에서 조회한 비밀번호와 사용자가 입력한 비밀번호가 일치하는지 판단
@@ -49,41 +58,50 @@ public class MemberService {
         }
     }
 
+    /**
+     * 관리자 모드용 회원 전체 확인
+     */
     public List<MemberDTO> findAll() {
         List<MemberEntity> memberEntityList = memberRepository.findAll();
         List<MemberDTO> memberDTOList = new ArrayList<>();
         for (MemberEntity memberEntity: memberEntityList) {
             memberDTOList.add(MemberDTO.toMemberDTO(memberEntity));
-//            MemberDTO memberDTO = MemberDTO.toMemberDTO(memberEntity);
-//            memberDTOList.add(memberDTO);
         }
         return memberDTOList;
     }
 
+    /**
+     * 마이페이지 (return Member)
+     */
     public MemberDTO findById(Long id) {
         Optional<MemberEntity> optionalMemberEntity = memberRepository.findById(id);
-        if (optionalMemberEntity.isPresent()) {
-
-            return MemberDTO.toMemberDTO(optionalMemberEntity.get());
-        } else {
-            return null;
-        }
+        return optionalMemberEntity.map(MemberDTO::toMemberDTO).orElse(null);
 
     }
 
+    /**
+     * 회원정보 수정 페이지 (Id에 관련된 회원 정보를 넘겨줌)
+     * @return MemberDTO
+     */
     public MemberDTO updateForm(String userId) {
         Optional<MemberEntity> memberEntity = memberRepository.findByUserId(userId);
-        if (memberEntity.get() != null) {
+        if (memberEntity.isEmpty()) {
             return MemberDTO.toMemberDTO(memberEntity.get());
         } else {
             return null;
         }
     }
 
+    /**
+     * 회원 정보 수정 하기
+     */
     public void update(MemberDTO memberDTO) {
         memberRepository.save(MemberEntity.toUpdateMemberEntity(memberDTO));
     }
 
+    /**
+     * 회원 삭제
+     */
     public void deleteById(String userid) {
         Optional<MemberEntity> findId = memberRepository.findByUserId(userid);
         if (findId.isPresent()) {
@@ -94,6 +112,10 @@ public class MemberService {
         }
     }
 
+    /**
+     * 아이디 중복 확인
+     * @return ok, null
+     */
     public String idCheck(String userid) {
         Optional<MemberEntity> byUserId = memberRepository.findByUserId(userid);
         if (byUserId.isPresent()) {
@@ -105,6 +127,12 @@ public class MemberService {
         }
     }
 
+    /**
+     * 넌 뭐세요..? (추후에 리팩토링 예정)
+     * @param id
+     * @return
+     * @throws NotFoundMemberException
+     */
     public Optional<MemberEntity> findByMemberId(Long id) throws NotFoundMemberException {
         Optional<MemberEntity> memberId = memberRepository.findById(id);
         if (memberId.isPresent()){

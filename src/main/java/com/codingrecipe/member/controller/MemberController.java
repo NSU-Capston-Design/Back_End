@@ -1,5 +1,6 @@
 package com.codingrecipe.member.controller;
 
+import com.codingrecipe.member.dto.member.LoginDTO;
 import com.codingrecipe.member.dto.member.MemberDTO;
 import com.codingrecipe.member.dto.member.UserDTO;
 import com.codingrecipe.member.dto.member.UserIdDTO;
@@ -32,7 +33,7 @@ public class MemberController {
     }
 
     @PostMapping("/user/login")            //user/login
-    public ResponseEntity<UserDTO> login(@RequestBody MemberDTO memberDTO, HttpServletRequest request) {
+    public ResponseEntity<UserDTO> login(@RequestBody LoginDTO memberDTO, HttpServletRequest request) {
         MemberDTO loginResult = memberService.login(memberDTO);
         if (loginResult != null) {
             // login 성공시 세션 부여

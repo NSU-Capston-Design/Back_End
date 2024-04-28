@@ -30,7 +30,7 @@ public class Post {
 
     @OrderBy("commentId desc")
     @JsonIgnoreProperties({"post"})
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> commentList;
 
     public Post(String postTitle, String postDetail, MemberEntity member) {
