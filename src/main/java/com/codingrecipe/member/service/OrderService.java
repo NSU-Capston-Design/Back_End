@@ -63,12 +63,20 @@ public class OrderService {
 
         List<OrderItem> orderItems = new ArrayList<>();                             // orderItem을 생성 후 담을 List 생성
         log.info("===List<orderItems>에 orderItem 생성 후 넣기===");
-        for (int i = 0; i < products.size(); i++){
-            log.info("===orderItem 생성=== orderItem : " + orderItems.get(i));
-            OrderItem orderItem = OrderItem.createOrderItem(products.get(i), orderDTOS.get(i).getPrice(), orderDTOS.get(i).getCount());
 
+        if (orderDTOS.size() == 1){
+            OrderItem orderItem = OrderItem.createOrderItem(products.get(0), orderDTOS.get(0).getPrice(), orderDTOS.get(0).getCount());
             orderItems.add(orderItem);
         }
+        else {
+            for (int i = 0; i < products.size(); i++){
+                log.info("===orderItem 생성=== orderItem : " + orderItems.get(i));
+                OrderItem orderItem = OrderItem.createOrderItem(products.get(i), orderDTOS.get(i).getPrice(), orderDTOS.get(i).getCount());
+
+                orderItems.add(orderItem);
+            }
+        }
+
 
         log.info("===List<OrderItem> 배열로 변환===");
         OrderItem[] array = orderItems.toArray(new OrderItem[0]);
@@ -152,5 +160,19 @@ public class OrderService {
         } catch (NotFoundOrderException | IllegalStateException e){
             System.out.println(e.getMessage());
         }
+    }
+
+    /**
+     * 주문 수정
+     */
+    public void updateOrder(long id, int count){
+        Optional<OrderEntity> byId = orderRepository.findById(id);
+        if (byId.isEmpty()){
+            throw new NotFoundOrderException("주문이 존재하지 않습니다.");
+        }
+        for (int i = 0; i < byId.get().getOrderItems().size(); i++){
+            byId.get().getOrderItems().get(i).setCount(count);
+        }
+
     }
 }
