@@ -55,7 +55,7 @@ public class OrderEntity {
     /**
      * 주문 생성
      */
-    public static OrderEntity createOrder(MemberEntity member, OrderItem... orderItems){
+    public static OrderEntity createOrder(MemberEntity member, List<OrderItem> orderItems){
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setMember(member);
         for (OrderItem orderItem : orderItems){

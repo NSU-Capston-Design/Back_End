@@ -38,6 +38,7 @@ public class ProductService {
      */
     public void uploadFile(ProductRequest productRequest) {          // 파일을 매개변수로 받음
         try {
+            System.out.println("service계층 Inven : " + productRequest.getData().getProductInven());
             MultipartFile file = productRequest.getFile();
             log.info("===MultipartFile file에 담기 성공===");
 
@@ -79,11 +80,11 @@ public class ProductService {
             String filePath = "/photos/postPhoto/" + saveFileName;   // 상대경로로 변경
 
 
-
+            System.out.println("productInven = " + productInven);
             ProductDTO fileUploadDTO = new ProductDTO(produtName, file.getSize(),
                     file.getContentType(), date, price, filePath, productInven, byMemberId, category);
 
-
+            System.out.println("fileUploadDTO.getProductInven() = " + fileUploadDTO.getProductInven());
             // DTO에서 엔터티로 변환
             ProductEntity uploadedFile = new ProductEntity();
             uploadedFile.createProduct(fileUploadDTO);

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 
@@ -12,6 +13,7 @@ import javax.persistence.*;
 @Getter @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
+@Slf4j
 @Table(name = "OrderItem")
 public class OrderItem {
 
@@ -35,12 +37,20 @@ public class OrderItem {
 
     //==생성 메서드==//
     public static OrderItem createOrderItem(ProductEntity product, int orderPrice, int count) throws NotEnoughInvenException {
+        log.info("주문 생성. ");
         OrderItem orderItem = new OrderItem();
+
+        log.info("product 생성. = " +product);
         orderItem.setProduct(product);
+
+        log.info("orderPrice 생성. = " + orderPrice);
         orderItem.setOrderPrice(orderPrice);
+
+        log.info("count 생성. " + count);
         orderItem.setCount(count);
 
         product.removeInven(count);
+        log.info("===orderItem 생성===");
         return orderItem;
     }
 

@@ -29,6 +29,7 @@ public class ProductController {
     // data: { 상품 이름, 상품 가격, 유저이름 }이 담겨 있음. 이걸 따로 Dto에 저장해서 엔티티로 변환.
 
         try {
+            System.out.println("재고수량 : " + data.getProductInven());
             ProductRequest productRequest = new ProductRequest();
             productRequest.setFile(file);
             log.info("===DTO file set 성공=== : " + file);
