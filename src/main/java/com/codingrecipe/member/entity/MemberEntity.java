@@ -41,7 +41,7 @@ public class MemberEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private List<OrderEntity> orders = new ArrayList<>();
 
     public static MemberEntity toMemberEntity(MemberDTO memberDTO) {

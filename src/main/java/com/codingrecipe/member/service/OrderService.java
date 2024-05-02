@@ -17,7 +17,9 @@ import com.codingrecipe.member.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,10 +36,14 @@ public class OrderService {
     /**
      * 주문 생성
      */
+    @Transactional
     public void createOrder(OrderItmesDTO orderItmesDTO) throws NotFoundProductException, NotEnoughInvenException, NotFoundMemberException {
 
         log.info("===주문 생성===");
 
+        for (int i = 0; i < orderItmesDTO.getOrderRequestDTOS().size(); i++){
+            System.out.println("count = " + orderItmesDTO.getOrderRequestDTOS().get(i).getCount());
+        }
         List<ProductEntity> products = new ArrayList<>();       // 받은 상품들을 넣을 가변 배열 List 생성
 
         String userId = orderItmesDTO.getUserId();              // 주문한 유저정보 가져오기
@@ -60,32 +66,35 @@ public class OrderService {
             log.info("===유저 조회 실패=== userId :" + byUserId.get());
             throw new NotFoundMemberException("사용자를 찾을 수 없습니다.");
         }
+        MemberEntity memberEntity = byUserId.get();
 
-        List<OrderItem> orderItems = new ArrayList<>();                             // orderItem을 생성 후 담을 List 생성
+        List<OrderItem> orderItems = new ArrayList<>(orderDTOS.size());                             // orderItem을 생성 후 담을 List 생성
         log.info("===List<orderItems>에 orderItem 생성 후 넣기===");
 
         if (orderDTOS.size() == 1){
+            log.info("===orderDTOS.size가 1일때===");
             OrderItem orderItem = OrderItem.createOrderItem(products.get(0), orderDTOS.get(0).getPrice(), orderDTOS.get(0).getCount());
             orderItems.add(orderItem);
+
+            log.info("===OrderEntity 생성===");
+            OrderEntity order = OrderEntity.createOrder(memberEntity, orderItems);
+
+            log.info("===OrderEntity 저장===");
+            orderRepository.save(order);
         }
         else {
-            for (int i = 0; i < products.size(); i++){
-                log.info("===orderItem 생성=== orderItem : " + orderItems.get(i));
+            for (int i = 0; i < orderDTOS.size(); i++){
+                log.info("===orderItem 생성=== i : " + i);
                 OrderItem orderItem = OrderItem.createOrderItem(products.get(i), orderDTOS.get(i).getPrice(), orderDTOS.get(i).getCount());
 
                 orderItems.add(orderItem);
             }
+            log.info("===OrderEntity 생성===");
+            OrderEntity order = OrderEntity.createOrder(memberEntity, orderItems);
+
+            log.info("===OrderEntity 저장===");
+            orderRepository.save(order);
         }
-
-
-        log.info("===List<OrderItem> 배열로 변환===");
-        OrderItem[] array = orderItems.toArray(new OrderItem[0]);
-
-        log.info("===OrderEntity 생성===");
-        OrderEntity order = OrderEntity.createOrder(byUserId.get(), array);
-
-        log.info("===OrderEntity 저장===");
-        orderRepository.save(order);
     }
 
     /**

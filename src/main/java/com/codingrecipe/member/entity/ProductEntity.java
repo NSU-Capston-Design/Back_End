@@ -60,6 +60,7 @@ public class ProductEntity {
         this.uploadTime = productDTO.getUploadTime();
         this.productPrice = productDTO.getProductPrice();
         this.productURL = productDTO.getProductURL();
+        this.productInven = productDTO.getProductInven();
         this.memberEntity = productDTO.getMemberEntity();
 
     }
