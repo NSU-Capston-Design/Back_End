@@ -1,6 +1,7 @@
 package com.codingrecipe.member.service;
 
 import com.codingrecipe.member.dto.order.OrderDTO;
+import com.codingrecipe.member.dto.order.OrderItemsResDTO;
 import com.codingrecipe.member.dto.order.OrderItmesDTO;
 import com.codingrecipe.member.dto.order.OrderRequestDTO;
 import com.codingrecipe.member.entity.MemberEntity;
@@ -12,6 +13,7 @@ import com.codingrecipe.member.exception.NotFoundMemberException;
 import com.codingrecipe.member.exception.NotFoundOrderException;
 import com.codingrecipe.member.exception.NotFoundProductException;
 import com.codingrecipe.member.repository.MemberRepository;
+import com.codingrecipe.member.repository.OrderItemRepository;
 import com.codingrecipe.member.repository.OrderRepository;
 import com.codingrecipe.member.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +34,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
-
+    private final OrderItemRepository orderItemRepository;
     /**
      * 주문 생성
      */
@@ -94,36 +96,71 @@ public class OrderService {
 
             log.info("===OrderEntity 저장===");
             orderRepository.save(order);
+
+            log.info("===OrderItem에 OrderEntity set===");
+            for (OrderItem orderItem : orderItems){
+                orderItem.setOrder(order);
+            }
+
+            log.info("===orderItem 저장===");
+            orderItemRepository.saveAll(orderItems);
         }
     }
 
     /**
      * 주문 조회
      */
+    @Transactional
     public List<OrderDTO> orders(String userId) throws NotFoundMemberException {
+        log.info("===orders 호출됨=== userId : " + userId);
         Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);
         if (byUserId.isEmpty()){
+            log.info("===해당 MemberEntity 없음=== userId : " + userId);
             throw new NotFoundMemberException("사용자를 찾을 수 없습니다. userId: " + userId);
         }
-        List<OrderEntity> orders = orderRepository.findByMember(byUserId.get());
 
-        List<OrderDTO> orderDTOList = new ArrayList<>();
+        List<OrderEntity> orders = orderRepository.findByMember(byUserId.get());
+        if (orders.isEmpty()){
+            log.info("===멤버에 해당하는 주문이 존재하지 않음=== userId : " + userId);
+            throw new NotFoundOrderException("주문이 존재하지 않습니다.");
+        }
+
+        List<OrderDTO> orderDTOS = new ArrayList<>();
 
         for (int i = 0; i < orders.size(); i++){
+            log.info("===orderDTOList에 orderEntity 집어넣기=== i : " + i);
             OrderEntity orderEntity = orders.get(i);
-            OrderDTO build = new OrderDTO.Builder()
+
+            List<OrderItemsResDTO> orderDTOList = new ArrayList<>();
+
+            for (int j = 0; j < orderEntity.getOrderItems().size(); j++){
+                OrderItemsResDTO build = OrderItemsResDTO.builder()
+                        .id(orderEntity.getOrderItems().get(i).getId())
+                        .orderPrice(orderEntity.getOrderItems().get(i).getOrderPrice())
+                        .count(orderEntity.getOrderItems().get(i).getCount())
+                        .productName(orderEntity.getOrderItems().get(i).getProduct().getProductName())
+                        .productId(orderEntity.getOrderItems().get(i).getProduct().getFileId())
+                        .build();
+
+                orderDTOList.add(build);
+            }
+
+
+            OrderDTO orderDTO = OrderDTO.builder()
                     .orderId(orderEntity.getOrderId())
                     .orderDate(orderEntity.getOrderDate())
                     .orderStatus(orderEntity.getOrderStatus())
                     .delivery(orderEntity.getDelivery())
-                    .orderItems(orderEntity.getOrderItems())
+                    .orderItems(orderDTOList)
                     .orderTotalCost(orderEntity.getTotalPrice())
                     .build();
 
-            orderDTOList.add(build);
+            log.info("===orderDTOList에 넣기 성공===");
+            orderDTOS.add(orderDTO);
+
         }
 
-        return orderDTOList;
+        return orderDTOS;
     }
 
     /**
@@ -139,12 +176,29 @@ public class OrderService {
         OrderEntity orderEntity = byId.get();
         log.info("===[Builder]OrderEntity를 OrderDTO로 변환===");
 
-        return  new OrderDTO.Builder()
+        List<OrderItemsResDTO> orderItemsResDTOS = new ArrayList<>();
+
+        log.info("===orderItems.size=== size : " + orderEntity.getOrderItems().size());
+        for (int i = 0; i < orderEntity.getOrderItems().size(); i++){
+            log.info("===orderItems 변환=== index : " + i);
+            OrderItemsResDTO build = OrderItemsResDTO.builder()
+                    .id(orderEntity.getOrderItems().get(i).getId())
+                    .orderPrice(orderEntity.getOrderItems().get(i).getOrderPrice())
+                    .count(orderEntity.getOrderItems().get(i).getCount())
+                    .productId(orderEntity.getOrderItems().get(i).getProduct().getFileId())
+                    .productName(orderEntity.getOrderItems().get(i).getProduct().getProductName())
+                    .build();
+
+            orderItemsResDTOS.add(build);
+        }
+
+        log.info("===OrderDTO 반환===");
+        return   OrderDTO.builder()
                 .orderId(orderEntity.getOrderId())
                 .orderDate(orderEntity.getOrderDate())
                 .orderStatus(orderEntity.getOrderStatus())
                 .delivery(orderEntity.getDelivery())
-                .orderItems(orderEntity.getOrderItems())
+                .orderItems(orderItemsResDTOS)
                 .orderTotalCost(orderEntity.getTotalPrice())
                 .build();
     }
