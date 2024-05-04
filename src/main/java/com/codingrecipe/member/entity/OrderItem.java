@@ -31,7 +31,7 @@ public class OrderItem {
     @JoinColumn(name = "order_id")
     private OrderEntity order;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)  // 지연로딩 설정
+    @ManyToOne(fetch = FetchType.LAZY)  // 지연로딩 설정
     @JoinColumn(name = "file_id")
     private ProductEntity product;
 

@@ -33,11 +33,11 @@ public class OrderEntity {
     @Enumerated(EnumType.STRING)
     private DeliveryStatus delivery;      // 배송 상태 (BEFO, SHIP, COMP)
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private MemberEntity member;
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "order")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
     private List<OrderItem> orderItems = new ArrayList<>();
 
     //==연관관계 메서드==//

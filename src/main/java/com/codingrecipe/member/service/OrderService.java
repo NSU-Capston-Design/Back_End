@@ -57,11 +57,10 @@ public class OrderService {
         String userId = orderItmesDTO.getUserId();              // 주문한 유저정보 가져오기
         List<OrderRequestDTO> orderDTOS = orderItmesDTO.getOrderRequestDTOS(); // 주문받은 리스트 빼서 저장
 
-        for (int i = 0; i < orderDTOS.size(); i++){                 // for문으로 주문받은 products들 조회
-            OrderRequestDTO orderRequestDTO = orderDTOS.get(i);
+        for (OrderRequestDTO orderRequestDTO : orderDTOS) {                 // for문으로 주문받은 products들 조회
             log.info("===productId로 상품조회=== fileId : " + orderRequestDTO.getProductId());
             Optional<ProductEntity> byFileId = productRepository.findByFileId(orderRequestDTO.getProductId());
-            if (byFileId.isEmpty()){        // byfileId가 존재 안할시에 예외처리
+            if (byFileId.isEmpty()) {        // byfileId가 존재 안할시에 예외처리
                 log.info("===상품이 존재하지 않음=== fileId : " + orderRequestDTO.getProductId());
                 throw new NotFoundProductException("상품을 찾을 수 없습니다.", orderRequestDTO.getProductId());
             }
@@ -69,36 +68,16 @@ public class OrderService {
         }
 
         log.info("===유저 조회===");
-        Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);// userId를 통해 유저 찾기
+        Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);  // userId를 통해 유저 찾기
         if (byUserId.isEmpty()){                                                  // 만약 없는 id라면 예외처리
             log.info("===유저 조회 실패=== userId :" + byUserId.get());
             throw new NotFoundMemberException("사용자를 찾을 수 없습니다.");
         }
         MemberEntity memberEntity = byUserId.get();
 
-        List<OrderItem> orderItems = new ArrayList<>(orderDTOS.size());                             // orderItem을 생성 후 담을 List 생성
+        List<OrderItem> orderItems = new ArrayList<>(orderDTOS.size());           // orderItem을 생성 후 담을 List 생성
         log.info("===List<orderItems>에 orderItem 생성 후 넣기===");
 
-//        if (orderDTOS.size() == 1){
-//            log.info("===orderDTOS.size가 1일때===");
-//            OrderItem orderItem = OrderItem.createOrderItem(products.get(0), orderDTOS.get(0).getPrice(), orderDTOS.get(0).getCount());
-//            orderItems.add(orderItem);
-//
-//            log.info("===OrderEntity 생성===");
-//            OrderEntity order = OrderEntity.createOrder(memberEntity, orderItems);
-//
-//            log.info("===OrderEntity 저장===");
-//            orderRepository.save(order);
-//
-//            log.info("===OrderItem에 OrderEntity set===");
-//            for (OrderItem orderItem : orderItems){
-//                orderItem.setOrder(order);
-//            }
-//
-//            log.info("===orderItem 저장===");
-//            orderItemRepository.saveAll(orderItems);
-//        }
-//        else {
             for (int i = 0; i < orderDTOS.size(); i++){
                 log.info("===orderItem 생성=== i : " + i);
                 OrderItem orderItem = OrderItem.createOrderItem(products.get(i), orderDTOS.get(i).getPrice(), orderDTOS.get(i).getCount());
@@ -119,7 +98,7 @@ public class OrderService {
 
             log.info("===orderItem 저장===");
             orderItemRepository.saveAll(orderItems);
-//        }
+
     }
 
     /**
@@ -147,7 +126,6 @@ public class OrderService {
 
             String date = localDateToDate(order.getOrderDate());// 변환한 날짜 저장
 
-            // i번째 orderId로 orderItems 조회
             List<OrderItem> orderItems = orderItemRepository.findOrderItemByOrderId(order.getOrderId());
             List<OrderItemsResDTO> orderDTOList = new ArrayList<>();
 
@@ -178,7 +156,6 @@ public class OrderService {
 
             log.info("===orderDTOList에 넣기 성공===");
             orderDTOS.add(orderDTO);
-
         }
 
         return orderDTOS;
@@ -196,7 +173,6 @@ public class OrderService {
         }
         OrderEntity orderEntity = byId.get();
         log.info("===[Builder]OrderEntity를 OrderDTO로 변환===");
-
 
         String date = localDateToDate(orderEntity.getOrderDate()); // 날짜 포맷 변환 및 String으로 변환
 
@@ -230,6 +206,7 @@ public class OrderService {
     /**
      * 주문 취소
      */
+    @Transactional
     public void deleteOrder(long orderId){
         try {
             log.info("===주문 취소=== orderId : " + orderId);
