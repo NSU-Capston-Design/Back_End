@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 public class OrderDTO {
     private long orderId;
-    private LocalDateTime orderDate;
+    private String orderDate;
     private OrderStatus orderStatus;            // 주문상태
     private DeliveryStatus delivery;      // 배송 상태 (BEFO, SHIP, COMP)
     private List<OrderItemsResDTO> orderItems = new ArrayList<>();

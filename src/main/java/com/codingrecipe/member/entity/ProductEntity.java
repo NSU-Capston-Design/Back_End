@@ -7,6 +7,8 @@ import lombok.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter @Setter
@@ -49,6 +51,9 @@ public class ProductEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private MemberEntity memberEntity;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
+    private List<OrderItem> orderItemList = new ArrayList<>();
 
 
     @Transactional

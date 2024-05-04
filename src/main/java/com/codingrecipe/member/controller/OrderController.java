@@ -71,7 +71,8 @@ public class OrderController {
      * 주문 취소
      */
     @DeleteMapping("/order/delete/{orderId}")
-    public void deleteOrder(@PathVariable("orderId") long orderId) {
+    public ResponseEntity<String> deleteOrder(@PathVariable("orderId") long orderId) {
         orderService.deleteOrder(orderId);
+        return ResponseEntity.ok("ok");
     }
 }
