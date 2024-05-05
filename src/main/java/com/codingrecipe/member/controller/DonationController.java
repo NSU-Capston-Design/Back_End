@@ -27,7 +27,7 @@ public class DonationController {
 
             donationDTO.setDonationDate(LocalDate.now());
             String result = donationService.donate(donationDTO);
-            return ResponseEntity.ok("기부가 완료되었습니다.");
+            return ResponseEntity.ok(result);
 
         } catch (NotFoundMemberException e){
             return ResponseEntity.badRequest().body(e.getMessage());

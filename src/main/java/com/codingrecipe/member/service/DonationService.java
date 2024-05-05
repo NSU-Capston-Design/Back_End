@@ -52,6 +52,7 @@ public class DonationService {
     /**
      * 기부 총액 조회
      */
+    @Transactional
     public int getTotalDonationAmount(String userId) throws NotFoundMemberException {
         Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);
         if (byUserId.isEmpty()){
@@ -65,18 +66,22 @@ public class DonationService {
         return totalAmount;
     }
 
+    /**
+     * Top 10명 기부자 닉네임 반환
+     * @param limit
+     * @return
+     */
+    @Transactional
     public List<String> getTopDonators(int limit) {
         List<DonationEntity> donations = donationRepository.findAll();
 
-        List<String> topDonators = donations.stream()
+        return donations.stream()
                 .collect(Collectors.groupingBy(DonationEntity::getMember, Collectors.summingInt(DonationEntity::getAmount)))
                 .entrySet().stream()
                 .sorted((entry1, entry2) -> Integer.compare(entry2.getValue(), entry1.getValue()))
                 .limit(limit)
-                .map(entry -> entry.getKey() + " (총 기부금액: " + entry.getValue() + "원)")
+                .map(entry -> entry.getKey().getUserId())
                 .collect(Collectors.toList());
-
-        return topDonators;
     }
 
     public String getDonationGrade(int donationAmount) {
@@ -96,6 +101,7 @@ public class DonationService {
     }
 
     // 기부 여부 확인 메서드
+    @Transactional
     public boolean hasDonated(String userId) throws NotFoundMemberException {
         Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);
         if (byUserId.isEmpty()){
@@ -110,6 +116,7 @@ public class DonationService {
     /**
      * 유저 기부내역 확인
      */
+    @Transactional
     public List<DonationEntity> getDonationsByUser(String userId) throws NotFoundMemberException {
         Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);
         if (byUserId.isEmpty()){

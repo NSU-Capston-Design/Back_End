@@ -10,6 +10,7 @@ import com.codingrecipe.member.repository.MemberRepository;
 import com.codingrecipe.member.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class CommentService {
     /**
      * 댓글 저장
      */
+    @Transactional
     public String commentSave(CommentSaveDTO commentSaveDTO){
         Optional<MemberEntity> byUserId = memberRepository.findByUserId(commentSaveDTO.getUserId());
         Optional<Post> byId = postRepository.findById((long) commentSaveDTO.getPostId());
@@ -41,6 +43,7 @@ public class CommentService {
     /**
      * 댓글 조회
      */
+    @Transactional
     public List<CommentDTO> commentAll(Integer postId){
         Optional<Post> byId = postRepository.findById((long) postId);
         if (byId.isPresent()){
@@ -61,6 +64,7 @@ public class CommentService {
     /**
      * 댓글 삭제
      */
+    @Transactional
     public String commentDelete(Integer commentId){
         commentRepository.deleteById((long)commentId);
         return "ok";
