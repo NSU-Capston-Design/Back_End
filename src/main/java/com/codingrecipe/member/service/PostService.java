@@ -10,6 +10,7 @@ import com.codingrecipe.member.repository.MemberRepository;
 import com.codingrecipe.member.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class PostService {
      * @param postSaveDTO
      * @return
      */
+    @Transactional
     public String postSave(PostSaveDTO postSaveDTO){
 
         Optional<MemberEntity> byUserId = memberRepository.findByUserId(postSaveDTO.getUserId());
@@ -42,6 +44,7 @@ public class PostService {
     /**
      * 게시글리스트 불러오기
      */
+    @Transactional
     public List<PostAllDTO> postAll(){
         List<Post> all = postRepository.findAll();
         List<PostAllDTO> postAll = new ArrayList<>();
@@ -56,6 +59,7 @@ public class PostService {
     /**
      * 게시글 단일 조회
      */
+    @Transactional
     public PostOneDTO postOne(Long postId){
         Optional<Post> byId = postRepository.findById(postId);
         if (byId.isEmpty()){
@@ -68,6 +72,7 @@ public class PostService {
     /**
      * 게시글 수정
      */
+    @Transactional
     public String postModify(Long postId, RequestPostDTO requestPostDTO){
         Optional<Post> byId = Optional.ofNullable(postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not Found with id: " + postId)));
         if (byId.isEmpty()){
@@ -84,6 +89,7 @@ public class PostService {
     /**
      * 게시글 삭제
      */
+    @Transactional
     public String postDelete(Long postId){
         if(postRepository.findById(postId).isEmpty()){
             return null;
