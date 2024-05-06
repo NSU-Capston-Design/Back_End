@@ -106,5 +106,16 @@ public class DonationController {
         }
     }
 
+    // Top10 유저 확인
+    @GetMapping("/donations/TopCheck")
+    public ResponseEntity<?> checkTopUser(@RequestParam("userId") String userId) {
+        try {
+            boolean hasDonated = donationService.hasDonated(userId);
+            return ResponseEntity.ok(hasDonated);
+        } catch (NotFoundMemberException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
 }
