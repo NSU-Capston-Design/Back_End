@@ -114,6 +114,30 @@ public class DonationService {
     }
 
     /**
+     * top 10 기부인들 여부 확인 (boolean)
+     */
+    @Transactional
+    public boolean checkTopUser(String userId) throws NotFoundMemberException {
+        List<DonationEntity> all = donationRepository.findAll();
+        all.stream()
+                .collect(Collectors.groupingBy(DonationEntity::getMember, Collectors.summingInt(DonationEntity::getAmount)))
+                .entrySet().stream()
+                .sorted((entry1, entry2) -> Integer.compare(entry2.getValue(), entry1.getValue()))
+                .limit(10)
+                .map(entry -> entry.getKey().getUserId())
+                .collect(Collectors.toList());
+
+        Optional<MemberEntity> byUserId = memberRepository.findByUserId(userId);
+        if (byUserId.isEmpty()){
+            throw new NotFoundMemberException("사용자를 찾을 수 없습니다. userId : " + userId);
+        }
+        // 해당 사용자의 기부 내역을 조회합니다.
+        List<DonationEntity> donations = donationRepository.findAllByUserId(byUserId.get());
+        return !donations.isEmpty();
+        // 기부 내역이 존재하면 true를 반환합니다.
+    }
+
+    /**
      * 유저 기부내역 확인
      */
     @Transactional

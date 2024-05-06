@@ -11,9 +11,12 @@ import java.util.List;
 public interface DonationRepository extends JpaRepository<DonationEntity, Long> {
     @Query("SELECT d FROM DonationEntity d where d.member = :member")
     List<DonationEntity> findAllByUserId(MemberEntity member);
+
     List<DonationEntity> findAllByDonationDate(LocalDate donationDate);
+
     List<DonationEntity> findAllByAmount(int amount);
 
     @Query("SELECT d FROM DonationEntity d WHERE d.member = :member")
     List<DonationEntity> findAllByMember(MemberEntity member);
+
 }
